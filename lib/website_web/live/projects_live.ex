@@ -93,10 +93,7 @@ defmodule WebsiteWeb.ProjectsLive do
 
   def project_card(assigns) do
     ~H"""
-    <div class={[
-      "card group cursor-pointer overflow-hidden h-full bg-white hover:shadow-xl transition-all duration-300 hover:scale-105",
-      if(@featured, do: "card-quirky", else: "")
-    ]}>
+    <div class="card group cursor-pointer overflow-hidden h-full bg-white hover:shadow-xl transition-all duration-300 hover:scale-105">
       <div class="p-6">
         <!-- Status Badge -->
         <div class="flex items-center justify-between mb-4">
