@@ -15,6 +15,7 @@ alias Website.Blog.{Category, Post}
 alias Website.Photo
 alias Website.Projects
 alias Website.Projects.{Project, ProjectStatus, Technology}
+alias Website.Accounts
 
 Repo.insert!(%Category{name: "dev", slug: "dev", description: "my musings on software development and technology"})
 Repo.insert!(%Category{name: "games", slug: "games", description: "my musings on games"})
@@ -101,7 +102,7 @@ end
 
 # Create project statuses (only if they don't exist)
 live_status = case Projects.get_project_status_by_slug("live") do
-  nil -> 
+  nil ->
     Repo.insert!(%ProjectStatus{
       name: "Live",
       slug: "live",
