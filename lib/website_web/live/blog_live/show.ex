@@ -12,7 +12,7 @@ defmodule WebsiteWeb.BlogLive.Show do
     socket =
       socket
       |> assign(:post, post)
-      |> assign(:page_title, post.title)
+      |> assign(:base_title, post.title)
     {:noreply, socket}
   end
 

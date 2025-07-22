@@ -12,6 +12,7 @@ defmodule WebsiteWeb.AboutLive do
       |> assign(:selected_category, "Me")
       |> assign(:photos, photos)
       |> assign(:current_path, "/about")
+      |> assign(:base_title, "About")
 
     {:ok, socket}
   end
@@ -35,17 +36,13 @@ defmodule WebsiteWeb.AboutLive do
       <!-- Hero Section -->
       <section class="relative pt-24 pb-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="text-center mb-16">
-            <div class="relative inline-block mb-2">
-              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 mb-8 pb-2">
+          <div class="text-center">
+            <div class="relative inline-block">
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900">
                 About <span class="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-flower transform -rotate-1 inline-block">Me</span>
               </h1>
               <span class="handwritten text-lg text-orange-500 absolute -top-4 -right-8 transform rotate-12">the human behind the code</span>
             </div>
-            <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              Developer, learner, and creator of digital experiences.
-              <span class="font-mono bg-green-100 px-2 py-1 rounded text-emerald-700">Here's my story!</span>
-            </p>
           </div>
         </div>
       </section>

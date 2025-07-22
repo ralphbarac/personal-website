@@ -11,6 +11,7 @@ defmodule WebsiteWeb.BlogLive.Index do
       socket
       |> stream(:posts, posts)
       |> assign(:current_path, "/blog")
+      |> assign(:base_title, "Blog")
 
     {:ok, socket}
   end

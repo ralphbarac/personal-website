@@ -54,6 +54,7 @@ defmodule WebsiteWeb do
       use Phoenix.LiveView,
         layout: {WebsiteWeb.Layouts, :app}
 
+      on_mount WebsiteWeb.PageTitle
       unquote(html_helpers())
     end
   end

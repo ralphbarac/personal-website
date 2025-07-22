@@ -10,6 +10,7 @@ defmodule WebsiteWeb.ProjectsLive do
       socket
       |> assign(:projects, projects)
       |> assign(:current_path, "/projects")
+      |> assign(:base_title, "Projects")
     {:ok, socket}
   end
 

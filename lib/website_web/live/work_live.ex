@@ -2,7 +2,11 @@ defmodule WebsiteWeb.WorkLive do
   use WebsiteWeb, :live_view
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :current_path, "/work")}
+    socket =
+      socket
+      |> assign(:current_path, "/work")
+      |> assign(:base_title, "Work")
+    {:ok, socket}
   end
 
   def render(assigns) do
