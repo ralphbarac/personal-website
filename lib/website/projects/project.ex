@@ -10,7 +10,7 @@ defmodule Website.Projects.Project do
     field :featured, :boolean, default: false
 
     belongs_to :project_status, Website.Projects.ProjectStatus
-    many_to_many :technologies, Website.Projects.Technology, join_through: "project_technologies"
+    many_to_many :technologies, Website.Projects.Technology, join_through: "project_technologies", on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
