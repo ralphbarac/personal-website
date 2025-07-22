@@ -1,6 +1,8 @@
 defmodule WebsiteWeb.Router do
   use WebsiteWeb, :router
 
+  import WebsiteWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,11 +10,13 @@ defmodule WebsiteWeb.Router do
     plug :put_root_layout, html: {WebsiteWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
+
 
   scope "/", WebsiteWeb do
     pipe_through :browser
@@ -24,6 +28,7 @@ defmodule WebsiteWeb.Router do
     live "/blog/posts/:id", BlogLive.Show
     live "/projects", ProjectsLive
   end
+
 
   # Other scopes may use custom stacks.
   # scope "/api", WebsiteWeb do
@@ -45,5 +50,34 @@ defmodule WebsiteWeb.Router do
       live_dashboard "/dashboard", metrics: WebsiteWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
     end
+  end
+
+  ## Authentication routes
+
+  scope "/", WebsiteWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    get "/users/log_in", UserSessionController, :new
+    post "/users/log_in", UserSessionController, :create
+  end
+
+  scope "/", WebsiteWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    get "/users/settings", UserSettingsController, :edit
+    put "/users/settings", UserSettingsController, :update
+    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+  end
+
+  scope "/", WebsiteWeb do
+    pipe_through [:browser]
+
+    delete "/users/log_out", UserSessionController, :delete
+  end
+
+  scope "/admin", WebsiteWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live "/", AdminLive
   end
 end
