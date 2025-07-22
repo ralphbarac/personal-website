@@ -4,12 +4,6 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 
 ## Features
 
-### 🎨 **Design & UX**
-- Playful, organic design with floating animations and handwritten annotations
-- Fully responsive across all device sizes
-- High accessibility standards with semantic HTML and proper ARIA labels
-- Smooth transitions and hover effects
-
 ### 📝 **Blog System**
 - Database-driven blog with categories and posts
 - Automatic read time calculation
@@ -67,25 +61,6 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 - `mix assets.build` - Build frontend assets
 - `mix assets.deploy` - Build and minify assets for production
 
-## Current Architecture
-
-### Database Schema
-- **Posts** - Blog content with categories, read time, and rich text
-- **Categories** - Blog post categorization
-- **Photos** - Gallery images with descriptions and categories
-- **Projects** - Portfolio projects with status and technology relationships
-- **ProjectStatus** - Project status tracking (Live, In Development, Completed)
-- **Technologies** - Technology stack items
-- **ProjectTechnologies** - Many-to-many join table
-
-### LiveView Pages
-- `/` - Splash page with introduction
-- `/about` - Personal story with photo gallery
-- `/work` - Professional experience
-- `/projects` - Portfolio showcase
-- `/blog` - Blog index with post cards
-- `/blog/posts/:id` - Individual blog post reading
-
 ## What's Next
 
 ### 🎯 **Immediate Roadmap**
@@ -112,25 +87,6 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
    - JSON schema for recipe data
    - Search and filtering capabilities
    - Integration with main site
-
-### 🔮 **Future Enhancements**
-- Search functionality across blog and projects
-- Comment system for blog posts
-- Email newsletter integration
-- Performance monitoring and analytics
-- CDN integration for images
-
-## Development Notes
-
-- All code follows Phoenix conventions and Elixir best practices
-- Database changes require migrations - use `mix ecto.gen.migration`
-- Assets are compiled automatically in development
-- Tests should be written for all new features
-- Accessibility is a priority - maintain WCAG 2.1 AA standards
-
-## Deployment
-
-Ready for production deployment! Check the [Phoenix deployment guides](https://hexdocs.pm/phoenix/deployment.html) for platform-specific instructions.
 
 ## Tech Stack References
 
