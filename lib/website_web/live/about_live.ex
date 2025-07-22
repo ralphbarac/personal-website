@@ -138,10 +138,10 @@ defmodule WebsiteWeb.AboutLive do
                   <% end %>
                 </div>
 
-                <!-- Photo Grid -->
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                  <%= for photo <- @photos do %>
-                    <%= gallery_image(assigns, photo) %>
+                <!-- Photo Collage -->
+                <div class="collage-grid">
+                  <%= for {photo, index} <- Enum.with_index(@photos) do %>
+                    <%= gallery_image(assigns, photo, get_collage_size(index)) %>
                   <% end %>
                 </div>
               </div>
@@ -153,15 +153,15 @@ defmodule WebsiteWeb.AboutLive do
     """
   end
 
-  def gallery_image(assigns, photo) do
-    assigns = assign(assigns, :photo, photo)
+  def gallery_image(assigns, photo, size) do
+    assigns = assign(assigns, :photo, photo) |> assign(:size, size)
     ~H"""
-    <div class="group cursor-pointer">
-      <div class="relative overflow-hidden rounded-2xl aspect-square bg-neutral-100">
+    <div class={["group cursor-pointer collage-item", @size]}>
+      <div class="relative overflow-hidden rounded-2xl bg-neutral-100 h-full">
         <img
           src={@photo.image_path}
           alt={@photo.description}
-          class="object-cover w-full h-full transition-all duration-500 group-hover:scale-110"
+          class="object-cover object-center w-full h-full transition-all duration-500 group-hover:scale-110"
         />
         <!-- Overlay -->
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -174,5 +174,25 @@ defmodule WebsiteWeb.AboutLive do
       </div>
     </div>
     """
+  end
+
+  # Creates a collage pattern with better aspect ratios
+  defp get_collage_size(index) do
+    pattern = [
+      "size-normal",     # 1x1 - square
+      "size-wide",       # 2x1 - landscape
+      "size-normal",     # 1x1 - square
+      "size-normal",     # 1x1 - square (was tall, now square to avoid distortion)
+      "size-large",      # 2x2 - big square
+      "size-normal",     # 1x1 - square
+      "size-wide",       # 2x1 - landscape
+      "size-normal",     # 1x1 - square
+      "size-normal",     # 1x1 - square
+      "size-normal",     # 1x1 - square
+      "size-wide",       # 2x1 - landscape
+      "size-normal"      # 1x1 - square
+    ]
+    
+    Enum.at(pattern, rem(index, length(pattern)))
   end
 end

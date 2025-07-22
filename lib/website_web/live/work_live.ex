@@ -68,9 +68,10 @@ defmodule WebsiteWeb.WorkLive do
                     workplace="Info~Tech Research Group"
                     role="Intermediate Software Developer"
                     points={[
-                      "Developed applications using Ruby on Rails, primarily focused on HR related diagnostics.",
+                      "Developed various applications using Ruby on Rails, Javascript, and Python, primarily focused on HR related diagnostics.",
                       "Refactored and optimized data pipelines utilizing PySpark and AWS technologies, including Glue, Step Functions, Lambdas, and Athena.",
                       "Provided client support and managed incoming support requests.",
+                      "Directed a team of engineers during an internal hackathon to prototype an AI-powered feature that was later approved for integration into the product roadmap.",
                       "Recognized as IT Person of the Month twice for outstanding contributions.",
                       "Earned Professional Scrum Master certification."
                     ]}

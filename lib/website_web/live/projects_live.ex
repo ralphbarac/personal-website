@@ -25,17 +25,17 @@ defmodule WebsiteWeb.ProjectsLive do
       </div>
 
       <!-- Hero Section -->
-      <section class="relative pt-20 pb-16">
+      <section class="relative pt-20 pb-2">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div class="text-center mb-16">
             <div class="relative inline-block mb-2">
-              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 mb-8 pb-4">
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-display font-bold text-slate-900 mb-2">
                 <span class="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-flower transform -rotate-1 inline-block pb-4">Projects</span>
               </h1>
               <span class="handwritten text-lg text-orange-500 absolute -top-4 -right-12 transform rotate-12">things I built!</span>
             </div>
             <p class="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              A collection of projects from personal experiments to professional applications.
+              A collection of projects I've completed or am currently working on.
               <span class="font-mono bg-green-100 px-2 py-1 rounded text-emerald-700 block mt-2">Code, creativity & caffeine!</span>
             </p>
           </div>
