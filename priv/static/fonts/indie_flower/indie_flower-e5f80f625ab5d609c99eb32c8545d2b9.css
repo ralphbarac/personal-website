@@ -1,0 +1,7 @@
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Indie Flower';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./indieflower_regular-8a33aae7305b37411d775d6617e80aca.ttf?vsn=d') format('truetype');
+  }
