@@ -6,8 +6,8 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 
 ### 📝 **Blog System**
 - Database-driven blog with categories and posts
-- **Rich Text Editor**: Trix editor for WYSIWYG content creation
-- **Enhanced Code Blocks**: Documentation-style syntax highlighting with dark themes
+- Trix editor for WYSIWYG content creation
+- Documentation-style syntax highlighting with dark themes
 - Automatic read time calculation based on word count
 - SEO-optimized with meta descriptions and structured data
 - Accessible article reading component with optimized typography
@@ -32,12 +32,6 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 - Responsive collage-style layout with varied image sizes
 - Hover effects and smooth transitions
 
-### 🎨 **Design & UX**
-- Handcrafted design system with organic shapes and personality
-- Custom animations and floating elements
-- Glass morphism effects and gradient backgrounds
-- Mobile-responsive with smooth navigation
-- Progressive image loading and performance optimizations
 
 ### 🏗️ **Technical Stack**
 - **Backend**: Elixir + Phoenix LiveView
@@ -103,20 +97,10 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 
 ### 🎯 **Immediate Roadmap**
 
-1. **Category Management**
-   - Admin interface for creating/editing blog categories
-   - Category reordering and organization
-   - Category-based navigation improvements
-
 2. **RSS Feed**
    - XML feed generation for blog posts
    - Automatic updates on new posts
    - Feed discovery metadata
-
-3. **Search & Filtering**
-   - Full-text search across blog posts
-   - Tag-based filtering system
-   - Advanced search with categories and dates
 
 4. **Performance Enhancements**
    - Image optimization and CDN integration
@@ -131,22 +115,3 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 - [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS framework
 - [Trix Editor](https://trix-editor.org/) - Rich text editor for content creation
 - [PostgreSQL](https://www.postgresql.org/) - Relational database
-
-## Development Notes
-
-### 🔧 **Editor Integration**
-- Trix editor is fully integrated with Phoenix LiveView
-- Uses `phx-update="ignore"` to prevent editor disappearing during validation
-- Content is automatically synced between editor and form submission
-- File attachments disabled to focus on text content
-
-### 🎨 **Styling System**
-- Custom CSS variables for consistent design tokens
-- Organic shapes and animations for personality
-- Documentation-style code blocks with syntax highlighting
-- Mobile-first responsive design approach
-
-### 🔒 **Admin Security**
-- Admin routes protected (authentication implementation pending)
-- Form validation with real-time feedback
-- Draft/published workflow for content management
