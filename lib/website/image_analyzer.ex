@@ -6,14 +6,15 @@ defmodule Website.ImageAnalyzer do
 
   @doc """
   Analyzes an image file and returns metadata map.
-  For now, uses filename-based heuristics since we don't have image processing libs.
+  Uses ex_image_info to get real dimensions from image headers, and filename-based 
+  heuristics for priority scoring and focal point estimation.
   """
   def analyze_image(image_path, description \\ "", category \\ "") do
     # Extract filename for analysis
     filename = Path.basename(image_path, Path.extname(image_path))
     
-    # Estimate dimensions based on common patterns or defaults
-    {width, height} = estimate_dimensions(filename, image_path)
+    # Get real dimensions from image file
+    {width, height} = get_real_dimensions(image_path)
     
     %{
       width: width,
@@ -26,23 +27,19 @@ defmodule Website.ImageAnalyzer do
     }
   end
 
-  # Estimates image dimensions - in a real app, we'd use an image processing library
-  defp estimate_dimensions(filename, _image_path) do
-    cond do
-      # Wedding/group photos tend to be landscape
-      String.contains?(filename, ["wedding", "group", "friends"]) -> {1600, 1200}
-      
-      # Portrait photos tend to be vertical
-      String.contains?(filename, ["portrait", "with_", "me_"]) -> {1200, 1600}
-      
-      # Food photos are often square or slightly landscape
-      String.contains?(filename, ["beef", "chicken", "curry", "soup", "pasta"]) -> {1200, 1200}
-      
-      # Travel/landscape photos are wide
-      String.contains?(filename, ["abu_dhabi", "travel", "landscape"]) -> {1920, 1080}
-      
-      # Default dimensions
-      true -> {1200, 1200}
+  # Gets real image dimensions from file headers using ex_image_info
+  defp get_real_dimensions(image_path) do
+    try do
+      case File.read(image_path) do
+        {:ok, file_data} ->
+          case ExImageInfo.info(file_data) do
+            {_format, width, height, _variant} -> {width, height}
+            _ -> {1200, 1200}  # fallback if image info can't be parsed
+          end
+        {:error, _} -> {1200, 1200}  # fallback if file can't be read
+      end
+    rescue
+      _ -> {1200, 1200}  # fallback for any other errors
     end
   end
 
