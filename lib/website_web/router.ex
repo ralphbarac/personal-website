@@ -14,7 +14,7 @@ defmodule WebsiteWeb.Router do
   end
 
   pipeline :api do
-    plug :accepts, ["json"]
+    plug :accepts, ["json", "xml"]
   end
 
 
@@ -27,6 +27,12 @@ defmodule WebsiteWeb.Router do
     live "/blog", BlogLive.Index
     live "/blog/posts/:id", BlogLive.Show
     live "/projects", ProjectsLive
+  end
+
+  scope "/", WebsiteWeb do
+    pipe_through :api
+
+    get "/feed.xml", RSSController, :feed
   end
 
 

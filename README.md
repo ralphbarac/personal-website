@@ -11,6 +11,7 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 - Automatic read time calculation based on word count
 - SEO-optimized with meta descriptions and structured data
 - Accessible article reading component with optimized typography
+- RSS 2.0 feed with autodiscovery links and HTTP caching
 - Admin panel for content management
 
 ### 🛠️ **Admin Interface**
@@ -67,6 +68,7 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 3. **Visit the application:**
    - Main site: [localhost:4000](http://localhost:4000)
    - Admin panel: [localhost:4000/admin](http://localhost:4000/admin)
+   - RSS feed: [localhost:4000/feed.xml](http://localhost:4000/feed.xml)
    - Development dashboard: [localhost:4000/dev/dashboard](http://localhost:4000/dev/dashboard)
 
 ### Development Commands
@@ -97,12 +99,7 @@ A modern, responsive personal portfolio and blog built with Phoenix LiveView, fe
 
 ### 🎯 **Immediate Roadmap**
 
-2. **RSS Feed**
-   - XML feed generation for blog posts
-   - Automatic updates on new posts
-   - Feed discovery metadata
-
-4. **Performance Enhancements**
+1. **Performance Enhancements**
    - Image optimization and CDN integration
    - Caching strategies for static content
    - Database query optimizations
