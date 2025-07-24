@@ -11,6 +11,16 @@ module.exports = {
     "../lib/website_web.ex",
     "../lib/website_web/**/*.*ex"
   ],
+  safelist: [
+    // Dynamic photo gallery classes - 3 size system
+    'col-span-1', 'col-span-2', 'row-span-1', 'row-span-2',
+    'aspect-square', 'aspect-[16/9]', 'aspect-[2/3]',
+    'object-center', 'object-left', 'object-right', 'object-top', 'object-bottom',
+    'object-left-top', 'object-right-top', 'object-left-bottom', 'object-right-bottom',
+    // Grid responsive classes
+    'grid-cols-4', 'grid-cols-6', 'grid-cols-8',
+    'auto-rows-[200px]'
+  ],
   theme: {
     extend: {
       colors: {

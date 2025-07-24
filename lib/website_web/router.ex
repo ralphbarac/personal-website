@@ -79,5 +79,7 @@ defmodule WebsiteWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live "/", AdminLive
+    live "/photos", AdminPhotosLive
+    live "/projects", AdminProjectsLive
   end
 end
