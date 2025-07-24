@@ -85,5 +85,6 @@ defmodule WebsiteWeb.Router do
     live "/blog", AdminBlogLive
     live "/blog/new", AdminBlogLive.New
     live "/blog/edit/:id", AdminBlogLive.Edit
+    live "/categories", AdminCategoriesLive
   end
 end

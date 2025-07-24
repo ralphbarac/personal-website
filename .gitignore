@@ -120,6 +120,10 @@ tramp
 # Ignore uploaded files in development
 /priv/static/uploads/
 
+# Ignore image files
+/priv/static/images/about/
+/priv/static/images/blog/
+
 # Ignore any local SSL certificates
 /priv/cert/
 

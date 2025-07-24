@@ -1,19 +1,46 @@
 defmodule WebsiteWeb.BlogLive.Index do
-  alias Website.Blog.Posts
+  alias Website.Blog.{Posts, Categories}
   use WebsiteWeb, :live_view
 
   alias Website.Blog.Post
 
   def mount(_params, _session, socket) do
     posts = Posts.list_published_posts()
+    categories = Categories.list_categories()
 
     socket =
       socket
       |> stream(:posts, posts)
       |> assign(:current_path, "/blog")
       |> assign(:base_title, "Blog")
+      |> assign(:categories, categories)
+      |> assign(:selected_category_id, nil)
 
     {:ok, socket}
+  end
+
+  def handle_event("filter_category", %{"category_id" => ""}, socket) do
+    # Show all posts
+    posts = Posts.list_published_posts()
+    
+    socket =
+      socket
+      |> stream(:posts, posts, reset: true)
+      |> assign(:selected_category_id, nil)
+    
+    {:noreply, socket}
+  end
+
+  def handle_event("filter_category", %{"category_id" => category_id}, socket) do
+    category_id = String.to_integer(category_id)
+    posts = Posts.list_published_posts_by_category(category_id)
+    
+    socket =
+      socket
+      |> stream(:posts, posts, reset: true)
+      |> assign(:selected_category_id, category_id)
+    
+    {:noreply, socket}
   end
 
   def render(assigns) do
@@ -44,10 +71,50 @@ defmodule WebsiteWeb.BlogLive.Index do
         </div>
       </section>
 
+      <!-- Category Filter Pills -->
+      <section class="pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-center">
+            <div class="flex flex-wrap justify-center gap-3 max-w-4xl">
+              <!-- All Posts Filter -->
+              <button 
+                phx-click="filter_category" 
+                phx-value-category_id=""
+                class={[
+                  "inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2",
+                  if(@selected_category_id == nil,
+                    do: "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg transform scale-105",
+                    else: "bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 hover:from-emerald-200 hover:to-green-200"
+                  )
+                ]}
+              >
+                All Posts
+              </button>
+              
+              <!-- Category Filters -->
+              <button 
+                :for={category <- @categories}
+                phx-click="filter_category" 
+                phx-value-category_id={category.id}
+                class={[
+                  "inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2",
+                  if(@selected_category_id == category.id,
+                    do: "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg transform scale-105",
+                    else: "bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-700 hover:from-emerald-200 hover:to-green-200"
+                  )
+                ]}
+              >
+                <%= category.name %>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Blog Posts Grid -->
       <section class="pb-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="posts" phx-update="stream">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500" id="posts" phx-update="stream">
             <.blog_card :for={{dom_id, post} <- @streams.posts} post={post} id={dom_id}/>
           </div>
         </div>

@@ -3,6 +3,8 @@ defmodule WebsiteWeb.AdminBlogLive.New do
 
   alias Website.Blog.{Posts, Categories, Post}
 
+  @blog_uploads_dir "priv/static/images/blog/uploads"
+
   def mount(_params, _session, socket) do
     categories = Categories.list_categories()
     changeset = Posts.change_post(%Post{})
@@ -13,6 +15,7 @@ defmodule WebsiteWeb.AdminBlogLive.New do
       |> assign(:changeset, changeset)
       |> assign(:categories, categories)
       |> assign(:post, %Post{})
+      |> allow_upload(:featured_image, accept: ~w(.jpg .jpeg .png .gif), max_entries: 1, max_file_size: 5_000_000)
 
     {:ok, socket}
   end
@@ -28,8 +31,29 @@ defmodule WebsiteWeb.AdminBlogLive.New do
     {:noreply, socket}
   end
 
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :featured_image, ref)}
+  end
+
   def handle_event("save", %{"post" => post_params}, socket) do
-    case Posts.create_post(post_params) do
+    # Handle image upload
+    uploaded_files = consume_uploaded_entries(socket, :featured_image, fn %{path: path}, entry ->
+      filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
+      dest = Path.join([@blog_uploads_dir, filename])
+      
+      File.mkdir_p!(Path.dirname(dest))
+      File.cp!(path, dest)
+      
+      {:ok, "/images/blog/uploads/#{filename}"}
+    end)
+
+    # Add image path to post params if an image was uploaded
+    final_post_params = case uploaded_files do
+      [image_path] -> Map.put(post_params, "image_path", image_path)
+      [] -> post_params
+    end
+
+    case Posts.create_post(final_post_params) do
       {:ok, post} ->
         socket =
           socket
@@ -49,16 +73,21 @@ defmodule WebsiteWeb.AdminBlogLive.New do
     <div class="min-h-screen bg-slate-50">
       <div class="bg-white shadow-sm border-b border-slate-200">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="py-6">
-            <nav class="flex items-center space-x-2 text-sm text-slate-500 mb-4">
-              <.link navigate="/admin" class="hover:text-slate-700">Admin</.link>
-              <span>/</span>
-              <.link navigate="/admin/blog" class="hover:text-slate-700">Blog</.link>
-              <span>/</span>
-              <span class="text-slate-900">New Post</span>
-            </nav>
-            <h1 class="text-3xl font-bold text-slate-900">Create New Post</h1>
-            <p class="mt-2 text-slate-600">Write and publish a new blog post</p>
+          <div class="py-6 flex items-center justify-between">
+            <div>
+              <nav class="flex items-center space-x-2 text-sm text-slate-500 mb-4">
+                <.link navigate="/admin" class="hover:text-slate-700">Admin</.link>
+                <span>/</span>
+                <.link navigate="/admin/blog" class="hover:text-slate-700">Blog</.link>
+                <span>/</span>
+                <span class="text-slate-900">New Post</span>
+              </nav>
+              <h1 class="text-3xl font-bold text-slate-900">Create New Post</h1>
+              <p class="mt-2 text-slate-600">Write and publish a new blog post</p>
+            </div>
+            <.link navigate="/admin" class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700">
+              Back to Admin
+            </.link>
           </div>
         </div>
       </div>
@@ -118,16 +147,52 @@ defmodule WebsiteWeb.AdminBlogLive.New do
                 <p class="mt-1 text-xs text-slate-500">This appears in search results and post previews</p>
               </div>
 
-              <!-- Image Path -->
-              <div>
+              <!-- Featured Image Upload -->
+              <div class="lg:col-span-2">
                 <label class="block text-sm font-medium text-slate-700 mb-2">
-                  Featured Image Path <span class="text-red-500">*</span>
+                  Featured Image <span class="text-red-500">*</span>
                 </label>
-                <.input 
-                  field={f[:image_path]} 
-                  type="text" 
-                  placeholder="/images/blog/my-post.jpg"
-                />
+                <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
+                  <.live_file_input upload={@uploads.featured_image} class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100" />
+                  <p class="mt-2 text-xs text-slate-500">
+                    Upload JPG, PNG, or GIF (recommended size: 1200x630px)
+                  </p>
+                </div>
+                
+                <div :for={entry <- @uploads.featured_image.entries} class="mt-2">
+                  <div class="bg-slate-100 rounded p-2 text-sm flex items-center justify-between">
+                    <span><%= entry.client_name %> (<%= entry.progress %>%)</span>
+                    <button 
+                      type="button" 
+                      phx-click="cancel-upload" 
+                      phx-value-ref={entry.ref}
+                      class="text-red-600 hover:text-red-800"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  
+                  <%= for err <- upload_errors(@uploads.featured_image, entry) do %>
+                    <div class="text-red-600 text-sm mt-1"><%= error_to_string(err) %></div>
+                  <% end %>
+                </div>
+                
+                <%= for err <- upload_errors(@uploads.featured_image) do %>
+                  <div class="text-red-600 text-sm mt-1"><%= error_to_string(err) %></div>
+                <% end %>
+                
+                <!-- Fallback: Manual Image Path -->
+                <div class="mt-4">
+                  <label class="block text-sm font-medium text-slate-700 mb-2">
+                    Or enter image path manually (optional)
+                  </label>
+                  <.input 
+                    field={f[:image_path]} 
+                    type="text" 
+                    placeholder="/images/blog/my-post.jpg"
+                  />
+                  <p class="mt-1 text-xs text-slate-500">Use this if you prefer to host images elsewhere</p>
+                </div>
               </div>
 
               <!-- Status -->
@@ -171,4 +236,9 @@ defmodule WebsiteWeb.AdminBlogLive.New do
     </div>
     """
   end
+
+  defp error_to_string(:too_large), do: "File too large (max 5MB)"
+  defp error_to_string(:too_many_files), do: "Too many files (only 1 allowed)"
+  defp error_to_string(:not_accepted), do: "Unacceptable file type (only JPG, PNG, GIF allowed)"
+  defp error_to_string(error), do: "Upload error: #{inspect(error)}"
 end

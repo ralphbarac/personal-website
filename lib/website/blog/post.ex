@@ -22,12 +22,21 @@ defmodule Website.Blog.Post do
   def changeset(post, attrs) do
     post
     |> cast(attrs, [:title, :body, :slug, :description, :image_path, :read_time, :category_id, :status])
-    |> validate_required([:title, :body, :description, :image_path, :category_id])
+    |> validate_required([:title, :body, :description, :category_id])
     |> validate_inclusion(:status, @valid_statuses)
     |> generate_slug()
     |> validate_required([:slug])
     |> unique_constraint(:slug)
     |> calculate_read_time()
+    |> validate_image_path()
+  end
+
+  defp validate_image_path(changeset) do
+    # Ensure that either image_path is provided or it's an update (existing record has one)
+    case {get_field(changeset, :image_path), changeset.data.id} do
+      {nil, nil} -> add_error(changeset, :image_path, "must be provided for new posts")
+      _ -> changeset
+    end
   end
 
   defp generate_slug(changeset) do

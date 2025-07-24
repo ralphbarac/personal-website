@@ -47,15 +47,14 @@ defmodule WebsiteWeb.SplashLive do
             <!-- Personality-rich description -->
             <div class="max-w-3xl mx-auto space-y-4">
               <p class="text-lg sm:text-xl text-slate-600 leading-relaxed">
-                I'm a <span class="font-mono bg-green-100 px-2 py-1 rounded text-emerald-700">software developer</span> at
-                <span class="font-semibold text-teal-600">Info~Tech Research Group</span>,
-                where I craft elegant solutions and occasionally break things
-                <span class="handwritten text-orange-500">(but fix them too!)</span>
+                I'm a <span class="font-mono bg-green-100 px-2 py-1 rounded text-emerald-700">software developer</span>
+                who enjoys crafting elegant solutions -- and occasionally breaking things
+                <span class="handwritten text-orange-500">(but fixing them too!)</span>
               </p>
 
               <p class="text-lg text-slate-600 leading-relaxed">
-                When I'm not coding, you'll find me running D&D campaigns,
-                experimenting in the kitchen, or trying to break 100 on the golf course
+                When I'm not coding, I'm probably running a D&D campaign,
+                experimenting in the kitchen, or chasing the dream of breaking 100 on the golf course
                 <span class="text-sm text-slate-500">(still working on that last one 😅)</span>
               </p>
             </div>

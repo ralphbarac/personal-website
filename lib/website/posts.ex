@@ -14,6 +14,15 @@ defmodule Website.Blog.Posts do
     |> Repo.preload(:category)
   end
 
+  def list_published_posts_by_category(category_id) do
+    from(p in Post, 
+      where: p.status == "published" and p.category_id == ^category_id, 
+      order_by: [desc: p.inserted_at]
+    )
+    |> Repo.all()
+    |> Repo.preload(:category)
+  end
+
   def list_posts_admin(filters \\ %{}) do
     query = from(p in Post, order_by: [desc: p.inserted_at])
 

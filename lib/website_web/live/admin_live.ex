@@ -52,7 +52,7 @@ defmodule WebsiteWeb.AdminLive do
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Blog Management Card -->
           <.link navigate="/admin/blog" class="block">
             <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
@@ -68,7 +68,27 @@ defmodule WebsiteWeb.AdminLive do
                 </div>
               </div>
               <div class="mt-4">
-                <p class="text-sm text-slate-600">Create, edit, and manage blog posts and categories.</p>
+                <p class="text-sm text-slate-600">Create, edit, and manage blog posts.</p>
+              </div>
+            </div>
+          </.link>
+
+          <!-- Categories Management Card -->
+          <.link navigate="/admin/categories" class="block">
+            <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                </div>
+                <div class="ml-4">
+                  <h3 class="text-lg font-medium text-slate-900">Categories</h3>
+                  <p class="text-sm text-slate-500">Manage blog categories</p>
+                </div>
+              </div>
+              <div class="mt-4">
+                <p class="text-sm text-slate-600">Create and organize blog post categories.</p>
               </div>
             </div>
           </.link>
@@ -98,7 +118,7 @@ defmodule WebsiteWeb.AdminLive do
             <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow">
               <div class="flex items-center">
                 <div class="flex-shrink-0">
-                  <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
                 </div>
