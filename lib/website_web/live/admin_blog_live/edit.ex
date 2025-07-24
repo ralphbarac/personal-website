@@ -1,14 +1,14 @@
 defmodule WebsiteWeb.AdminBlogLive.Edit do
   use WebsiteWeb, :live_view
 
-  alias Website.Blog.{Posts, Categories}
+  alias Website.Blog
 
   @blog_uploads_dir "priv/static/images/blog/uploads"
 
   def mount(%{"id" => id}, _session, socket) do
-    post = Posts.get_post!(id)
-    categories = Categories.list_categories()
-    changeset = Posts.change_post(post)
+    post = Blog.get_post!(id)
+    categories = Blog.list_categories()
+    changeset = Blog.change_post(post)
 
     socket =
       socket
@@ -24,7 +24,7 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
   def handle_event("validate", %{"post" => post_params}, socket) do
     changeset =
       socket.assigns.post
-      |> Posts.change_post(post_params)
+      |> Blog.change_post(post_params)
       |> Map.put(:action, :validate)
 
     socket = assign(socket, :changeset, changeset)
@@ -53,13 +53,13 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
       [] -> post_params
     end
 
-    case Posts.update_post(socket.assigns.post, final_post_params) do
+    case Blog.update_post(socket.assigns.post, final_post_params) do
       {:ok, post} ->
         socket =
           socket
           |> put_flash(:info, "Post updated successfully")
           |> assign(:post, post)
-          |> assign(:changeset, Posts.change_post(post))
+          |> assign(:changeset, Blog.change_post(post))
 
         {:noreply, socket}
 
@@ -70,7 +70,7 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
   end
 
   def handle_event("delete", _params, socket) do
-    case Posts.delete_post(socket.assigns.post) do
+    case Blog.delete_post(socket.assigns.post) do
       {:ok, _post} ->
         socket =
           socket
@@ -139,7 +139,7 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
               <span class="font-medium text-blue-900">Current Status:</span>
               <span class={[
                 "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ml-2",
-                if(@post.status == "published", do: "bg-green-100 text-green-800", else: "bg-yellow-100 text-yellow-800")
+                if(@post.status == :published, do: "bg-green-100 text-green-800", else: "bg-yellow-100 text-yellow-800")
               ]}>
                 <%= String.capitalize(@post.status) %>
               </span>
@@ -267,7 +267,7 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
                 <.input 
                   field={f[:status]} 
                   type="select" 
-                  options={[{"Draft", "draft"}, {"Published", "published"}]}
+                  options={[{"Draft", :draft}, {"Published", :published}]}
                 />
               </div>
 

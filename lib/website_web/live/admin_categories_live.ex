@@ -1,16 +1,17 @@
 defmodule WebsiteWeb.AdminCategoriesLive do
   use WebsiteWeb, :live_view
 
-  alias Website.Blog.{Categories, Category}
+  alias Website.Blog
+  alias Website.Blog.Category
 
   def mount(_params, _session, socket) do
-    categories = Categories.list_categories()
+    categories = Blog.list_categories()
 
     socket =
       socket
       |> assign(:current_path, "/admin/categories")
       |> assign(:categories, categories)
-      |> assign(:changeset, Categories.change_category(%Category{}))
+      |> assign(:changeset, Blog.change_category(%Category{}))
       |> assign(:editing_category, nil)
 
     {:ok, socket}
@@ -19,8 +20,8 @@ defmodule WebsiteWeb.AdminCategoriesLive do
   def handle_event("validate", %{"category" => category_params}, socket) do
     changeset = 
       case socket.assigns.editing_category do
-        nil -> Categories.change_category(%Category{}, category_params)
-        category -> Categories.change_category(category, category_params)
+        nil -> Blog.change_category(%Category{}, category_params)
+        category -> Blog.change_category(category, category_params)
       end
       |> Map.put(:action, :validate)
 
@@ -28,14 +29,14 @@ defmodule WebsiteWeb.AdminCategoriesLive do
   end
 
   def handle_event("save", %{"category" => category_params}, socket) do
-    case Categories.create_category(category_params) do
+    case Blog.create_category(category_params) do
       {:ok, _category} ->
-        categories = Categories.list_categories()
+        categories = Blog.list_categories()
         
         socket =
           socket
           |> assign(:categories, categories)
-          |> assign(:changeset, Categories.change_category(%Category{}))
+          |> assign(:changeset, Blog.change_category(%Category{}))
           |> put_flash(:info, "Category created successfully!")
 
         {:noreply, socket}
@@ -46,8 +47,8 @@ defmodule WebsiteWeb.AdminCategoriesLive do
   end
 
   def handle_event("edit", %{"id" => id}, socket) do
-    category = Categories.get_category!(id)
-    changeset = Categories.change_category(category)
+    category = Blog.get_category!(id)
+    changeset = Blog.change_category(category)
 
     socket =
       socket
@@ -58,15 +59,15 @@ defmodule WebsiteWeb.AdminCategoriesLive do
   end
 
   def handle_event("update", %{"category" => category_params}, socket) do
-    case Categories.update_category(socket.assigns.editing_category, category_params) do
+    case Blog.update_category(socket.assigns.editing_category, category_params) do
       {:ok, _category} ->
-        categories = Categories.list_categories()
+        categories = Blog.list_categories()
         
         socket =
           socket
           |> assign(:categories, categories)
           |> assign(:editing_category, nil)
-          |> assign(:changeset, Categories.change_category(%Category{}))
+          |> assign(:changeset, Blog.change_category(%Category{}))
           |> put_flash(:info, "Category updated successfully!")
 
         {:noreply, socket}
@@ -80,17 +81,17 @@ defmodule WebsiteWeb.AdminCategoriesLive do
     socket =
       socket
       |> assign(:editing_category, nil)
-      |> assign(:changeset, Categories.change_category(%Category{}))
+      |> assign(:changeset, Blog.change_category(%Category{}))
 
     {:noreply, socket}
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
-    category = Categories.get_category!(id)
+    category = Blog.get_category!(id)
 
-    case Categories.delete_category(category) do
+    case Blog.delete_category(category) do
       {:ok, _category} ->
-        categories = Categories.list_categories()
+        categories = Blog.list_categories()
         
         socket =
           socket

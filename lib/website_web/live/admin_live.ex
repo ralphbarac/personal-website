@@ -1,14 +1,13 @@
 defmodule WebsiteWeb.AdminLive do
   use WebsiteWeb, :live_view
 
-  alias Website.{Projects, Gallery}
-  alias Website.Blog.Posts
+  alias Website.{Blog, Projects, Gallery, Repo}
 
   def mount(_params, _session, socket) do
-    # Get counts for dashboard stats
-    project_count = length(Projects.list_projects())
-    photo_count = length(Gallery.fetch_photos())
-    blog_count = length(Posts.list_published_posts())
+    # Get counts for dashboard stats using optimized database aggregates
+    project_count = Repo.aggregate(Projects.Project, :count, :id)
+    photo_count = Gallery.count_photos()
+    blog_count = Blog.count_published_posts()
 
     socket =
       socket

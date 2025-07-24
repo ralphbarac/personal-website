@@ -1,6 +1,14 @@
 defmodule Website.Blog.Post do
+  @moduledoc """
+  Blog post schema for the website.
+
+  Represents blog posts with rich text content, categories, and metadata.
+  Automatically calculates read time based on word count.
+  """
   use Ecto.Schema
   import Ecto.Changeset
+
+  @valid_statuses ~w(draft published)a
 
   schema "posts" do
     field :title, :string
@@ -9,16 +17,20 @@ defmodule Website.Blog.Post do
     field :image_path, :string
     field :read_time, :integer, default: 0
     field :description, :string
-    field :status, :string, default: "draft"
+    field :status, Ecto.Enum, values: [:draft, :published], default: :draft
 
     belongs_to :category, Website.Blog.Category
 
     timestamps(type: :utc_datetime)
   end
 
-  @valid_statuses ~w(draft published)
+  @doc """
+  Creates a changeset for blog post creation and updates.
 
-  @doc false
+  Automatically generates slug from title if not provided.
+  Calculates read time based on body word count.
+  Validates image path for new posts.
+  """
   def changeset(post, attrs) do
     post
     |> cast(attrs, [:title, :body, :slug, :description, :image_path, :read_time, :category_id, :status])

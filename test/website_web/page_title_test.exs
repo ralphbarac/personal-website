@@ -31,7 +31,7 @@ defmodule WebsiteWeb.PageTitleTest do
         image_path: "/test.jpg",
         category_id: category.id,
         read_time: 1,
-        status: "published"
+        status: :published
       })
 
       {:ok, _view, html} = live(conn, ~p"/blog/posts/#{post.slug}")

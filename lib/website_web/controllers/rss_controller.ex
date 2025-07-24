@@ -1,11 +1,11 @@
 defmodule WebsiteWeb.RSSController do
   use WebsiteWeb, :controller
 
-  alias Website.Blog.Posts
+  alias Website.Blog
 
   def feed(conn, _params) do
     rss_config = Application.get_env(:website, :rss)
-    posts = Posts.list_published_posts_for_rss(rss_config[:max_items])
+    posts = Blog.list_published_posts_for_rss(rss_config[:max_items])
 
     # Generate ETag from latest post timestamp and post count for caching
     etag = generate_etag(posts)

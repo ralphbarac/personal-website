@@ -1,6 +1,7 @@
 defmodule WebsiteWeb.BlogLive.Show do
-  alias Website.Blog.Posts
   use WebsiteWeb, :live_view
+  
+  alias Website.Blog
 
   def mount(_params, _session, socket) do
     socket =
@@ -15,12 +16,12 @@ defmodule WebsiteWeb.BlogLive.Show do
     # Try to get by slug first, then by ID for backwards compatibility
     post = 
       try do
-        Posts.get_post_by_slug!(id)
+        Blog.get_published_post_by_slug!(id)
       rescue
         Ecto.NoResultsError ->
           # If slug lookup fails, try by ID (but still ensure it's published)
-          post = Posts.get_post!(id)
-          if post.status == "published" do
+          post = Blog.get_post!(id)
+          if post.status == :published do
             post
           else
             raise Ecto.NoResultsError, queryable: Website.Blog.Post

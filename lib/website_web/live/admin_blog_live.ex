@@ -1,39 +1,65 @@
 defmodule WebsiteWeb.AdminBlogLive do
   use WebsiteWeb, :live_view
 
-  alias Website.Blog.{Posts, Categories}
+  alias Website.Blog
 
   def mount(_params, _session, socket) do
-    posts = Posts.list_posts_admin()
-    categories = Categories.list_categories()
+    posts = Blog.list_posts_admin()
+    categories = Blog.list_categories()
 
     socket =
       socket
       |> assign(:current_path, "/admin/blog")
       |> assign(:posts, posts)
       |> assign(:categories, categories)
-      |> assign(:filters, %{title: "", category_id: "", status: ""})
+      |> assign(:filters, %{title: "", category_id: nil, status: nil})
 
     {:ok, socket}
   end
 
   def handle_event("filter", %{"filters" => filters}, socket) do
-    filtered_posts = Posts.list_posts_admin(filters)
+    normalized_filters = normalize_filters(filters)
+    filtered_posts = Blog.list_posts_admin(normalized_filters)
     
     socket =
       socket
       |> assign(:posts, filtered_posts)
-      |> assign(:filters, filters)
+      |> assign(:filters, normalized_filters)
 
     {:noreply, socket}
   end
 
+  # Normalize filter parameters for proper type handling
+  defp normalize_filters(filters) do
+    %{
+      title: Map.get(filters, "title", ""),
+      category_id: parse_integer(Map.get(filters, "category_id", "")),
+      status: parse_status(Map.get(filters, "status", ""))
+    }
+  end
+
+  defp parse_integer(""), do: nil
+  defp parse_integer(value) when is_binary(value) do
+    case Integer.parse(value) do
+      {int, ""} -> int
+      _ -> nil
+    end
+  end
+  defp parse_integer(value) when is_integer(value), do: value
+  defp parse_integer(_), do: nil
+
+  defp parse_status(""), do: nil
+  defp parse_status("draft"), do: :draft
+  defp parse_status("published"), do: :published
+  defp parse_status(status) when is_atom(status), do: status
+  defp parse_status(_), do: nil
+
   def handle_event("toggle_status", %{"id" => id}, socket) do
-    post = Posts.get_post!(id)
+    post = Blog.get_post!(id)
     
-    case Posts.toggle_post_status(post) do
+    case Blog.toggle_post_status(post) do
       {:ok, _post} ->
-        posts = Posts.list_posts_admin(socket.assigns.filters)
+        posts = Blog.list_posts_admin(socket.assigns.filters)
         socket = 
           socket
           |> assign(:posts, posts)
@@ -47,11 +73,11 @@ defmodule WebsiteWeb.AdminBlogLive do
   end
 
   def handle_event("delete_post", %{"id" => id}, socket) do
-    post = Posts.get_post!(id)
+    post = Blog.get_post!(id)
     
-    case Posts.delete_post(post) do
+    case Blog.delete_post(post) do
       {:ok, _post} ->
-        posts = Posts.list_posts_admin(socket.assigns.filters)
+        posts = Blog.list_posts_admin(socket.assigns.filters)
         socket = 
           socket
           |> assign(:posts, posts)
@@ -115,6 +141,7 @@ defmodule WebsiteWeb.AdminBlogLive do
                 <label class="block text-sm font-medium text-slate-700 mb-1">Category</label>
                 <select 
                   name="filters[category_id]" 
+                  value={@filters.category_id || ""}
                   class="w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
                 >
                   <option value="">All Categories</option>
@@ -127,11 +154,12 @@ defmodule WebsiteWeb.AdminBlogLive do
                 <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
                 <select 
                   name="filters[status]" 
+                  value={@filters.status && to_string(@filters.status) || ""}
                   class="w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500"
                 >
                   <option value="">All Status</option>
-                  <option value="draft" selected={@filters.status == "draft"}>Draft</option>
-                  <option value="published" selected={@filters.status == "published"}>Published</option>
+                  <option value="draft" selected={@filters.status == :draft}>Draft</option>
+                  <option value="published" selected={@filters.status == :published}>Published</option>
                 </select>
               </div>
             </div>
@@ -166,9 +194,9 @@ defmodule WebsiteWeb.AdminBlogLive do
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span class={[
                       "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                      if(post.status == "published", do: "bg-green-100 text-green-800", else: "bg-yellow-100 text-yellow-800")
+                      if(post.status == :published, do: "bg-green-100 text-green-800", else: "bg-yellow-100 text-yellow-800")
                     ]}>
-                      <%= String.capitalize(post.status) %>
+                      <%= String.capitalize(to_string(post.status)) %>
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
@@ -186,7 +214,7 @@ defmodule WebsiteWeb.AdminBlogLive do
                       phx-value-id={post.id}
                       class="text-blue-600 hover:text-blue-900"
                     >
-                      <%= if post.status == "published", do: "Unpublish", else: "Publish" %>
+                      <%= if post.status == :published, do: "Unpublish", else: "Publish" %>
                     </button>
                     <button 
                       phx-click="delete_post" 

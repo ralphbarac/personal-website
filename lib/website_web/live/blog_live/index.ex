@@ -1,12 +1,12 @@
 defmodule WebsiteWeb.BlogLive.Index do
-  alias Website.Blog.{Posts, Categories}
   use WebsiteWeb, :live_view
 
+  alias Website.Blog
   alias Website.Blog.Post
 
   def mount(_params, _session, socket) do
-    posts = Posts.list_published_posts()
-    categories = Categories.list_categories()
+    posts = Blog.list_published_posts()
+    categories = Blog.list_categories()
 
     socket =
       socket
@@ -21,7 +21,7 @@ defmodule WebsiteWeb.BlogLive.Index do
 
   def handle_event("filter_category", %{"category_id" => ""}, socket) do
     # Show all posts
-    posts = Posts.list_published_posts()
+    posts = Blog.list_published_posts()
     
     socket =
       socket
@@ -33,7 +33,7 @@ defmodule WebsiteWeb.BlogLive.Index do
 
   def handle_event("filter_category", %{"category_id" => category_id}, socket) do
     category_id = String.to_integer(category_id)
-    posts = Posts.list_published_posts_by_category(category_id)
+    posts = Blog.list_published_posts_by_category(category_id)
     
     socket =
       socket

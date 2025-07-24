@@ -1,13 +1,14 @@
 defmodule WebsiteWeb.AdminBlogLive.New do
   use WebsiteWeb, :live_view
 
-  alias Website.Blog.{Posts, Categories, Post}
+  alias Website.Blog
+  alias Website.Blog.Post
 
   @blog_uploads_dir "priv/static/images/blog/uploads"
 
   def mount(_params, _session, socket) do
-    categories = Categories.list_categories()
-    changeset = Posts.change_post(%Post{})
+    categories = Blog.list_categories()
+    changeset = Blog.change_post(%Post{})
 
     socket =
       socket
@@ -24,7 +25,7 @@ defmodule WebsiteWeb.AdminBlogLive.New do
     # Skip validation for trix-change events to prevent editor disappearing
     changeset =
       socket.assigns.post
-      |> Posts.change_post(post_params)
+      |> Blog.change_post(post_params)
       |> Map.put(:action, :validate)
 
     socket = assign(socket, :changeset, changeset)
@@ -53,7 +54,7 @@ defmodule WebsiteWeb.AdminBlogLive.New do
       [] -> post_params
     end
 
-    case Posts.create_post(final_post_params) do
+    case Blog.create_post(final_post_params) do
       {:ok, post} ->
         socket =
           socket
@@ -203,7 +204,7 @@ defmodule WebsiteWeb.AdminBlogLive.New do
                 <.input 
                   field={f[:status]} 
                   type="select" 
-                  options={[{"Draft", "draft"}, {"Published", "published"}]}
+                  options={[{"Draft", :draft}, {"Published", :published}]}
                 />
               </div>
             </div>

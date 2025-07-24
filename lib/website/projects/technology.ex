@@ -1,4 +1,9 @@
 defmodule Website.Projects.Technology do
+  @moduledoc """
+  Technology schema for tagging projects with tech stacks.
+
+  Represents programming languages, frameworks, tools, and technologies used in projects.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -11,11 +16,16 @@ defmodule Website.Projects.Technology do
     timestamps(type: :utc_datetime)
   end
 
-  @doc false
+  @doc """
+  Creates a changeset for technology creation and updates.
+
+  Validates slug format and ensures uniqueness for both name and slug.
+  """
   def changeset(technology, attrs) do
     technology
     |> cast(attrs, [:name, :slug])
     |> validate_required([:name, :slug])
+    |> validate_format(:slug, ~r/^[a-z0-9-]+$/, message: "must contain only lowercase letters, numbers, and hyphens")
     |> unique_constraint(:slug)
     |> unique_constraint(:name)
   end

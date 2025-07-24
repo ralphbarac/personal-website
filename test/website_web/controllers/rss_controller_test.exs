@@ -1,7 +1,8 @@
 defmodule WebsiteWeb.RSSControllerTest do
   use WebsiteWeb.ConnCase
 
-  alias Website.Blog.{Posts, Categories, Post, Category}
+  alias Website.Blog
+  alias Website.Blog.{Post, Category}
   alias Website.Repo
 
   describe "GET /feed.xml" do
@@ -25,19 +26,19 @@ defmodule WebsiteWeb.RSSControllerTest do
 
     test "includes published posts in feed", %{conn: conn} do
       # Create a test category
-      {:ok, category} = Categories.create_category(%{
+      {:ok, category} = Blog.create_category(%{
         name: "Test Category",
         slug: "test-category", 
         description: "Test category description"
       })
 
       # Create a published post
-      {:ok, _post} = Posts.create_post(%{
+      {:ok, _post} = Blog.create_post(%{
         title: "Test Post",
         body: "<p>Test content</p>",
         slug: "test-post",
         description: "Test description",
-        status: "published",
+        status: :published,
         category_id: category.id,
         image_path: "/images/blog/test.jpg"
       })
@@ -52,19 +53,19 @@ defmodule WebsiteWeb.RSSControllerTest do
 
     test "does not include draft posts in feed", %{conn: conn} do
       # Create a test category
-      {:ok, category} = Categories.create_category(%{
+      {:ok, category} = Blog.create_category(%{
         name: "Test Category",
         slug: "test-category",
         description: "Test category description"
       })
 
       # Create a draft post
-      {:ok, _post} = Posts.create_post(%{
+      {:ok, _post} = Blog.create_post(%{
         title: "Draft Post",
         body: "<p>Draft content</p>",
         slug: "draft-post",
         description: "Draft description",
-        status: "draft",
+        status: :draft,
         category_id: category.id,
         image_path: "/images/blog/draft.jpg"
       })
