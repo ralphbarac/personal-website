@@ -289,4 +289,20 @@ defmodule Website.Projects do
     |> Technology.changeset(attrs)
     |> Repo.insert()
   end
+
+  @doc """
+  Deletes a technology.
+
+  ## Examples
+
+      iex> delete_technology(technology)
+      {:ok, %Technology{}}
+
+      iex> delete_technology(technology)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_technology(%Technology{} = technology) do
+    Repo.delete(technology)
+  end
 end
