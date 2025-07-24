@@ -668,6 +668,109 @@ defmodule WebsiteWeb.CoreComponents do
   end
 
   @doc """
+  Renders a markdown editor with live preview.
+
+  ## Examples
+
+      <.markdown_editor field={f[:body]} label="Content" />
+      <.markdown_editor field={f[:body]} label="Content" rows="20" />
+  """
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :label, :string, default: nil
+  attr :rows, :string, default: "15"
+  attr :class, :string, default: nil
+  attr :placeholder, :string, default: "Write your content using Markdown..."
+
+  def markdown_editor(assigns) do
+    ~H"""
+    <div class={["markdown-editor-container", @class]}>
+      <%= if @label do %>
+        <label class="block text-sm font-medium text-slate-700 mb-2">
+          <%= @label %>
+        </label>
+      <% end %>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id={"markdown-editor-#{@field.field}"} phx-hook="MarkdownEditor">
+        <!-- Editor -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-medium text-slate-600">Markdown Editor</span>
+            <div class="flex items-center space-x-2 text-xs text-slate-500">
+              <span>**bold**</span>
+              <span>*italic*</span>
+              <span>`code`</span>
+              <span># heading</span>
+            </div>
+          </div>
+          <.input
+            field={@field}
+            type="textarea"
+            rows={@rows}
+            placeholder={@placeholder}
+            class="font-mono text-sm resize-none border-slate-300 focus:border-emerald-500 focus:ring-emerald-500"
+          />
+        </div>
+
+        <!-- Preview -->
+        <div class="space-y-2">
+          <span class="text-xs font-medium text-slate-600">Live Preview</span>
+          <div class="markdown-preview border border-slate-300 rounded-md p-3 bg-white min-h-full overflow-auto prose prose-sm max-w-none">
+            <!-- Preview content will be inserted here by JavaScript -->
+          </div>
+        </div>
+      </div>
+      
+      <p class="mt-2 text-xs text-slate-500">
+        Supports Markdown syntax: headings (#), bold (**bold**), italic (*italic*), links ([text](url)), code (`code`), and lists (- item).
+      </p>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a Trix rich text editor.
+
+  ## Examples
+
+      <.trix_editor field={f[:body]} label="Content" />
+      <.trix_editor field={f[:body]} label="Content" class="custom-class" />
+  """
+  attr :field, Phoenix.HTML.FormField, required: true
+  attr :label, :string, default: nil
+  attr :class, :string, default: nil
+  attr :placeholder, :string, default: "Write your content..."
+
+  def trix_editor(assigns) do
+    ~H"""
+    <div class={["trix-editor-container", @class]}>
+      <%= if @label do %>
+        <label class="block text-sm font-medium text-slate-700 mb-2">
+          <%= @label %>
+        </label>
+      <% end %>
+      
+      <div id={"trix-editor-#{@field.field}"} phx-hook="TrixEditor" phx-update="ignore">
+        <input 
+          type="hidden" 
+          name={@field.name} 
+          id={"#{@field.field}_trix_input"} 
+          value={Phoenix.HTML.Form.normalize_value("hidden", @field.value)}
+        />
+        <trix-editor 
+          input={"#{@field.field}_trix_input"}
+          class="block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 min-h-[300px]"
+          placeholder={@placeholder}
+        ></trix-editor>
+      </div>
+      
+      <p class="mt-2 text-xs text-slate-500">
+        Use the toolbar to format your content with bold, italic, links, lists, and more.
+      </p>
+    </div>
+    """
+  end
+
+  @doc """
   Translates the errors for a field from a keyword list of errors.
   """
   def translate_errors(errors, field) when is_list(errors) do

@@ -5,7 +5,7 @@ defmodule WebsiteWeb.BlogLive.Index do
   alias Website.Blog.Post
 
   def mount(_params, _session, socket) do
-    posts = Posts.list_posts()
+    posts = Posts.list_published_posts()
 
     socket =
       socket

@@ -21,11 +21,64 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+// Import Trix editor
+import "trix"
+
+// Trix Editor Hook
+const TrixEditor = {
+  mounted() {
+    this.setupTrix()
+  },
+
+  setupTrix() {
+    const trixEditor = this.el.querySelector('trix-editor')
+    const hiddenInput = this.el.querySelector('input[type="hidden"]')
+    
+    if (!trixEditor || !hiddenInput) return
+
+    // Disable file attachments since we don't want uploads
+    trixEditor.addEventListener('trix-attachment-add', (event) => {
+      event.attachment.remove()
+    })
+
+    // Sync Trix content with hidden input for form submission
+    trixEditor.addEventListener('trix-change', (event) => {
+      hiddenInput.value = trixEditor.innerHTML
+    })
+
+    // Handle form submission to ensure content is synced
+    const form = trixEditor.closest('form')
+    if (form) {
+      form.addEventListener('submit', () => {
+        if (trixEditor && trixEditor.editor && hiddenInput) {
+          hiddenInput.value = trixEditor.innerHTML
+        }
+      })
+    }
+
+    // Set initial content if present
+    if (hiddenInput.value) {
+      // Wait for Trix to fully initialize
+      if (trixEditor.editor) {
+        trixEditor.editor.loadHTML(hiddenInput.value)
+      } else {
+        trixEditor.addEventListener('trix-initialize', () => {
+          trixEditor.editor.loadHTML(hiddenInput.value)
+        }, { once: true })
+      }
+    }
+  }
+}
+
+let Hooks = {
+  TrixEditor: TrixEditor
+}
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
-  params: {_csrf_token: csrfToken}
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

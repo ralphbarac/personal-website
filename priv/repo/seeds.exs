@@ -60,7 +60,8 @@ posts = [
     description: "This is a test description for a post",
     slug: "my-first-blog-post",
     image_path: "/images/blog/escaping_tutorials.jpg",
-    category_id: dev_category.id
+    category_id: dev_category.id,
+    status: "published"
   },
   %{
     title: "test",
@@ -68,7 +69,8 @@ posts = [
     description: "This is a test description for a post",
     slug: "my-second-blog-post",
     image_path: "/images/blog/escaping_tutorials.jpg",
-    category_id: dev_category.id
+    category_id: dev_category.id,
+    status: "published"
   },
   %{
     title: "test",
@@ -76,7 +78,8 @@ posts = [
     description: "This is a test description for a post",
     slug: "my-third-blog-post",
     image_path: "/images/blog/escaping_tutorials.jpg",
-    category_id: games_category.id
+    category_id: games_category.id,
+    status: "published"
   },
   %{
     title: "test",
@@ -84,7 +87,8 @@ posts = [
     description: "This is a test description for a post",
     slug: "my-fourth-blog-post",
     image_path: "/images/blog/escaping_tutorials.jpg",
-    category_id: games_category.id
+    category_id: games_category.id,
+    status: "draft"
   },
   %{
     title: "test",
@@ -92,7 +96,8 @@ posts = [
     description: "This is a test description for a post",
     slug: "my-fifth-blog-post",
     image_path: "/images/blog/escaping_tutorials.jpg",
-    category_id: dev_category.id
+    category_id: dev_category.id,
+    status: "draft"
   }
 ]
 

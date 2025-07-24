@@ -3,11 +3,29 @@ defmodule WebsiteWeb.BlogLive.Show do
   use WebsiteWeb, :live_view
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :current_path, "/blog")}
+    socket =
+      socket
+      |> assign(:current_path, "/blog")
+      |> assign(:base_title, "Blog")
+
+    {:ok, socket}
   end
 
   def handle_params(%{"id" => id}, _uri, socket) do
-    post = Posts.get_post!(id)
+    # Try to get by slug first, then by ID for backwards compatibility
+    post = 
+      try do
+        Posts.get_post_by_slug!(id)
+      rescue
+        Ecto.NoResultsError ->
+          # If slug lookup fails, try by ID (but still ensure it's published)
+          post = Posts.get_post!(id)
+          if post.status == "published" do
+            post
+          else
+            raise Ecto.NoResultsError, queryable: Website.Blog.Post
+          end
+      end
 
     socket =
       socket

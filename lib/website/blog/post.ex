@@ -9,19 +9,40 @@ defmodule Website.Blog.Post do
     field :image_path, :string
     field :read_time, :integer, default: 0
     field :description, :string
+    field :status, :string, default: "draft"
 
     belongs_to :category, Website.Blog.Category
 
     timestamps(type: :utc_datetime)
   end
 
+  @valid_statuses ~w(draft published)
+
   @doc false
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:title, :body, :slug, :description, :image_path, :read_time, :category_id])
-    |> validate_required([:title, :body, :slug, :description, :image_path, :category_id])
+    |> cast(attrs, [:title, :body, :slug, :description, :image_path, :read_time, :category_id, :status])
+    |> validate_required([:title, :body, :description, :image_path, :category_id])
+    |> validate_inclusion(:status, @valid_statuses)
+    |> generate_slug()
+    |> validate_required([:slug])
     |> unique_constraint(:slug)
     |> calculate_read_time()
+  end
+
+  defp generate_slug(changeset) do
+    case get_field(changeset, :slug) do
+      nil ->
+        title = get_field(changeset, :title)
+        if title do
+          slug = title |> String.downcase() |> String.replace(~r/[^\w\s]/, "") |> String.replace(~r/\s+/, "-")
+          put_change(changeset, :slug, slug)
+        else
+          changeset
+        end
+      _ ->
+        changeset
+    end
   end
 
     # TODO: This could be refactored into a more general helper for strings/times.
