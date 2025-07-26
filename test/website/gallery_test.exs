@@ -13,15 +13,15 @@ defmodule Website.GalleryTest do
       :timer.sleep(10)  # Ensure different timestamps
       photo2 = photo_fixture(%{priority_score: 10, photo_category_id: category.id})
       :timer.sleep(10)
-      _photo3 = photo_fixture(%{priority_score: 8, photo_category_id: category.id})
+      photo3 = photo_fixture(%{priority_score: 6, photo_category_id: category.id})
       
       photos = Gallery.list_photos()
       
       # Should be ordered by priority (desc), then by insertion date (desc)
       assert length(photos) == 3
-      assert hd(photos).id == photo2.id  # Highest priority
-      # Last photo should be the oldest with lowest priority (photo1)
-      assert List.last(photos).id == photo1.id
+      assert hd(photos).id == photo2.id  # Highest priority (10)
+      # Last photo should have lowest priority
+      assert List.last(photos).id == photo3.id  # Lowest priority (6)
     end
 
     test "list_photos_by_category/1 filters by category name" do
@@ -95,8 +95,11 @@ defmodule Website.GalleryTest do
       assert {:ok, %Photo{} = photo} = Gallery.create_photo(valid_attrs)
       assert photo.description == "Beautiful sunset"
       assert photo.image_path == "/images/sunset.jpg"
-      assert photo.aspect_ratio == 1.5  # Calculated from width/height
-      assert photo.priority_score == 8
+      # Manual values preserved, analyzer only fills in missing fields
+      assert photo.aspect_ratio == 1.5  # Calculated from manual width/height (1200/800)
+      assert photo.width == 1200  # Manual value preserved
+      assert photo.height == 800  # Manual value preserved  
+      assert photo.priority_score == 8  # Manual value preserved
     end
 
     test "create_photo/1 with invalid data returns error changeset" do

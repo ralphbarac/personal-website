@@ -7,7 +7,7 @@ defmodule Website.Photo do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @valid_visual_weights ~w(light medium heavy)
+  @valid_visual_weights ~w(light medium heavy)a
 
   schema "photos" do
     field :description, :string
