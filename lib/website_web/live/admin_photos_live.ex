@@ -40,8 +40,11 @@ defmodule WebsiteWeb.AdminPhotosLive do
       [image_path] ->
         photo_params = Map.put(photo_params, "image_path", image_path)
 
-        case Repo.insert(Photo.create_changeset(%Photo{}, photo_params)) do
+        case Gallery.create_photo(photo_params) do
           {:ok, photo} ->
+            # Preload the photo_category for display
+            photo = Repo.preload(photo, :photo_category)
+            
             socket =
               socket
               |> stream_insert(:photos, photo, at: 0)
@@ -74,8 +77,11 @@ defmodule WebsiteWeb.AdminPhotosLive do
   def handle_event("update", %{"photo" => photo_params}, socket) do
     photo = socket.assigns.editing_photo
 
-    case Repo.update(Photo.changeset(photo, photo_params)) do
+    case Gallery.update_photo(photo, photo_params) do
       {:ok, updated_photo} ->
+        # Preload the photo_category for display
+        updated_photo = Repo.preload(updated_photo, :photo_category)
+        
         socket =
           socket
           |> stream_insert(:photos, updated_photo)
