@@ -117,12 +117,16 @@ defmodule Website.Gallery do
 
   """
   def create_photo(attrs \\ %{}) do
-    # Merge ImageAnalyzer metadata if image_path is provided
-    attrs_with_metadata = merge_image_analysis(attrs)
+    changeset = Photo.create_changeset(%Photo{}, attrs)
+    
+    changeset = 
+      if changeset.valid? do
+        add_image_analysis_to_changeset(changeset)
+      else
+        changeset
+      end
 
-    %Photo{}
-    |> Photo.create_changeset(attrs_with_metadata)
-    |> Repo.insert()
+    Repo.insert(changeset)
   end
 
   @doc """
@@ -138,22 +142,16 @@ defmodule Website.Gallery do
 
   """
   def update_photo(%Photo{} = photo, attrs) do
-    # Re-analyze image if image_path is being updated
-    attrs_with_metadata = 
-      if Map.has_key?(attrs, :image_path) or Map.has_key?(attrs, "image_path") do
-        merge_image_analysis(attrs)
+    changeset = Photo.changeset(photo, attrs)
+    
+    changeset = 
+      if changeset.valid? do
+        add_image_analysis_to_changeset(changeset)
       else
-        # If only updating description/category, merge with existing metadata for re-analysis
-        existing_metadata = %{
-          image_path: photo.image_path,
-          description: Map.get(attrs, :description) || Map.get(attrs, "description") || photo.description
-        }
-        merge_image_analysis(Map.merge(existing_metadata, attrs))
+        changeset
       end
 
-    photo
-    |> Photo.changeset(attrs_with_metadata)
-    |> Repo.update()
+    Repo.update(changeset)
   end
 
   @doc """
@@ -396,79 +394,62 @@ defmodule Website.Gallery do
 
   # Private helper functions
 
-  # Merges ImageAnalyzer metadata into photo attributes
-  defp merge_image_analysis(attrs) do
-    image_path = Map.get(attrs, :image_path) || Map.get(attrs, "image_path")
-    description = Map.get(attrs, :description) || Map.get(attrs, "description") || ""
+  defp add_image_analysis_to_changeset(changeset) do
+    image_path = Ecto.Changeset.get_field(changeset, :image_path)
+    description = Ecto.Changeset.get_field(changeset, :description) || ""
+    category_id = Ecto.Changeset.get_field(changeset, :photo_category_id)
     
-    # Get category name for analysis context
-    category_name = get_category_name_from_attrs(attrs)
-
     if image_path && image_path != "" do
       try do
-        # Run ImageAnalyzer
+        category_name = if category_id do
+          try do
+            category = get_photo_category!(category_id)
+            category.name
+          rescue
+            Ecto.NoResultsError -> ""
+          end
+        else
+          ""
+        end
+        
         analysis = ImageAnalyzer.analyze_image(image_path, description, category_name)
         
-        # Convert visual_weight to atom (Ecto.Enum expects atoms)
         visual_weight = case analysis.visual_weight do
           weight when is_atom(weight) -> weight
           weight when is_binary(weight) -> String.to_atom(weight)
           _ -> :medium
         end
-
-        # Merge analysis results into attributes, but preserve manually set values
-        analysis_attrs = %{
-          width: analysis.width,
-          height: analysis.height,
-          aspect_ratio: analysis.aspect_ratio,
-          priority_score: analysis.priority_score,
-          visual_weight: visual_weight,
-          focal_point_x: analysis.focal_point_x,
-          focal_point_y: analysis.focal_point_y
-        }
-        
-        # Only set analyzer values if not already provided in attrs
-        Enum.reduce(analysis_attrs, attrs, fn {key, analyzer_value}, acc ->
-          case Map.get(attrs, key) || Map.get(attrs, Atom.to_string(key)) do
-            nil -> Map.put(acc, key, analyzer_value)
-            _existing_value -> acc  # Keep existing value
-          end
-        end)
+        changeset
+        |> put_change_if_empty(:width, analysis.width)
+        |> put_change_if_empty(:height, analysis.height)
+        |> put_change_if_empty(:aspect_ratio, analysis.aspect_ratio)
+        |> put_change_if_empty(:priority_score, analysis.priority_score)
+        |> put_change_if_empty(:visual_weight, visual_weight)
+        |> put_change_if_empty(:focal_point_x, analysis.focal_point_x)
+        |> put_change_if_empty(:focal_point_y, analysis.focal_point_y)
       rescue
         error ->
-          # Log the error but don't fail the photo creation
           require Logger
           Logger.warning("ImageAnalyzer failed for #{image_path}: #{inspect(error)}")
-          
-          # Return original attrs with sensible defaults
-          Map.merge(attrs, %{
-            width: 1200,
-            height: 1200,
-            aspect_ratio: 1.0,
-            priority_score: 5,
-            visual_weight: :medium,
-            focal_point_x: 0.5,
-            focal_point_y: 0.5
-          })
+          changeset
+          |> put_change_if_empty(:width, 1200)
+          |> put_change_if_empty(:height, 1200)
+          |> put_change_if_empty(:aspect_ratio, 1.0)
+          |> put_change_if_empty(:priority_score, 5)
+          |> put_change_if_empty(:visual_weight, :medium)
+          |> put_change_if_empty(:focal_point_x, 0.5)
+          |> put_change_if_empty(:focal_point_y, 0.5)
       end
     else
-      attrs
+      changeset
     end
   end
 
-  # Helper to get category name for ImageAnalyzer context
-  defp get_category_name_from_attrs(attrs) do
-    category_id = Map.get(attrs, :photo_category_id) || Map.get(attrs, "photo_category_id")
-    
-    if category_id do
-      try do
-        category = get_photo_category!(category_id)
-        category.name
-      rescue
-        Ecto.NoResultsError -> ""
-      end
+  defp put_change_if_empty(changeset, field, value) do
+    if Ecto.Changeset.get_change(changeset, field) do
+      changeset
     else
-      ""
+      Ecto.Changeset.put_change(changeset, field, value)
     end
   end
 

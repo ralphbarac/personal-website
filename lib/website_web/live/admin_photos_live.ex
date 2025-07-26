@@ -7,7 +7,7 @@ defmodule WebsiteWeb.AdminPhotosLive do
   @uploads_dir "priv/static/images"
 
   def mount(_params, _session, socket) do
-    photos = Gallery.list_photos_by_date()  # Admin view: newest first
+    photos = Gallery.list_photos_by_date()
     categories = Gallery.list_photo_categories()
 
     socket =
@@ -42,7 +42,6 @@ defmodule WebsiteWeb.AdminPhotosLive do
 
         case Gallery.create_photo(photo_params) do
           {:ok, photo} ->
-            # Preload the photo_category for display
             photo = Repo.preload(photo, :photo_category)
             
             socket =
@@ -54,6 +53,11 @@ defmodule WebsiteWeb.AdminPhotosLive do
             {:noreply, socket}
 
           {:error, changeset} ->
+            # Log the error for debugging
+            require Logger
+            Logger.error("Failed to create photo: #{inspect(changeset.errors)}")
+            Logger.error("Photo params: #{inspect(photo_params)}")
+            
             {:noreply, assign(socket, :changeset, changeset)}
         end
 
@@ -79,7 +83,6 @@ defmodule WebsiteWeb.AdminPhotosLive do
 
     case Gallery.update_photo(photo, photo_params) do
       {:ok, updated_photo} ->
-        # Preload the photo_category for display
         updated_photo = Repo.preload(updated_photo, :photo_category)
         
         socket =
@@ -177,7 +180,7 @@ defmodule WebsiteWeb.AdminPhotosLive do
 
     # Refresh data
     categories = Gallery.list_photo_categories()
-    photos = Gallery.list_photos_by_date()  # Admin view: newest first
+    photos = Gallery.list_photos_by_date()
 
     socket =
       socket
