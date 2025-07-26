@@ -16,7 +16,7 @@ config :website, WebsiteWeb.Endpoint,
   # Enable gzip compression for all static assets
   gzip: true,
   # Force SSL in production
-  force_ssl: [hsts: true],
+  # force_ssl: [hsts: true],
   # Set security headers
   secure_browser_headers: %{
     "content-security-policy" =>
@@ -34,7 +34,7 @@ config :swoosh, local: false
 # Production logging configuration
 config :logger,
   level: :info,
-  metadata: [:request_id, :user_id],
+  # metadata: [:request_id, :user_id],
   backends: [:console]
 
 # Production asset optimization
