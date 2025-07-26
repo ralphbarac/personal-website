@@ -19,20 +19,24 @@ defmodule WebsiteWeb.PageTitleTest do
 
     test "blog post shows dynamic title", %{conn: conn} do
       # Create a test post
-      category = Website.Repo.insert!(%Website.Blog.Category{
-        name: "Tech", slug: "tech", description: "Tech posts"
-      })
-      
-      post = Website.Repo.insert!(%Website.Blog.Post{
-        title: "Test Post Title",
-        body: "Content",
-        slug: "test-post",
-        description: "Test",
-        image_path: "/test.jpg",
-        category_id: category.id,
-        read_time: 1,
-        status: :published
-      })
+      category =
+        Website.Repo.insert!(%Website.Blog.Category{
+          name: "Tech",
+          slug: "tech",
+          description: "Tech posts"
+        })
+
+      post =
+        Website.Repo.insert!(%Website.Blog.Post{
+          title: "Test Post Title",
+          body: "Content",
+          slug: "test-post",
+          description: "Test",
+          image_path: "/test.jpg",
+          category_id: category.id,
+          read_time: 1,
+          status: :published
+        })
 
       {:ok, _view, html} = live(conn, ~p"/blog/posts/#{post.slug}")
       # For now, just check that the title system is working

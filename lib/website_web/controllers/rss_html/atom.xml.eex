@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title><%= @rss_config[:title] %></title>
+  <subtitle><%= @rss_config[:description] %></subtitle>
+  <link href="<%= @site_url %>/blog" rel="alternate" type="text/html"/>
+  <link href="<%= @site_url <> "/feed.atom" %>" rel="self" type="application/atom+xml"/>
+  <id><%= @site_url %>/blog</id>
+  <author>
+    <name><%= @rss_config[:managing_editor] %></name>
+    <email><%= @rss_config[:managing_editor] %></email>
+  </author>
+  <generator>Phoenix/Elixir Atom Feed Generator</generator>
+  <updated><%= if @posts != [], do: format_atom_date(hd(@posts).updated_at), else: format_atom_date(DateTime.utc_now()) %></updated>
+  <%= for post <- @posts do %>
+  <entry>
+    <title><%= post.title %></title>
+    <content type="html"><![CDATA[<%= prepare_rss_content(post.body) %>]]></content>
+    <link href="<%= absolute_url("/blog/posts/" <> post.slug) %>" rel="alternate" type="text/html"/>
+    <id><%= absolute_url("/blog/posts/" <> post.slug) %></id>
+    <published><%= format_atom_date(post.inserted_at) %></published>
+    <updated><%= format_atom_date(post.updated_at) %></updated>
+    <%= if post.category do %>
+    <category term="<%= post.category.name %>" label="<%= post.category.name %>"/>
+    <% end %>
+    <summary><%= post.description %></summary>
+  </entry>
+  <% end %>
+</feed>

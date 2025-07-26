@@ -7,7 +7,7 @@ defmodule Website.Repo.Migrations.AddPhotoCategoryToPhotos do
     end
 
     create index(:photos, [:photo_category_id])
-    
+
     # Keep the old category string column temporarily for data migration
   end
 end

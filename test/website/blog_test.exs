@@ -6,30 +6,32 @@ defmodule Website.BlogTest do
   describe "read time calculation" do
     test "calculates read time correctly for different word counts" do
       category = insert(:category)
-      
+
       # Test short content (< 200 words = 1 minute)
       short_post = %{
         title: "Short",
-        body: String.duplicate("word ", 50), # 50 words
+        # 50 words
+        body: String.duplicate("word ", 50),
         slug: "short",
         description: "Short",
         image_path: "/test.jpg",
         category_id: category.id
       }
-      
+
       changeset = Post.changeset(%Post{}, short_post)
       assert Ecto.Changeset.get_change(changeset, :read_time) == 1
-      
+
       # Test long content (400 words = 2 minutes)
       long_post = %{
         title: "Long",
-        body: String.duplicate("word ", 400), # 400 words
+        # 400 words
+        body: String.duplicate("word ", 400),
         slug: "long",
         description: "Long",
         image_path: "/test.jpg",
         category_id: category.id
       }
-      
+
       changeset = Post.changeset(%Post{}, long_post)
       assert Ecto.Changeset.get_change(changeset, :read_time) == 2
     end

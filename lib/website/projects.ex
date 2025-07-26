@@ -20,7 +20,7 @@ defmodule Website.Projects do
   def list_projects do
     Project
     |> preload([:project_status, :technologies])
-    |> order_by([p], [desc: p.featured, desc: p.inserted_at])
+    |> order_by([p], desc: p.featured, desc: p.inserted_at)
     |> Repo.all()
   end
 

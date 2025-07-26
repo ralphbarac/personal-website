@@ -12,10 +12,10 @@ defmodule Website.ImageAnalyzer do
   def analyze_image(image_path, description \\ "", category \\ "") do
     # Extract filename for analysis
     filename = Path.basename(image_path, Path.extname(image_path))
-    
+
     # Get real dimensions from image file
     {width, height} = get_real_dimensions(image_path)
-    
+
     %{
       width: width,
       height: height,
@@ -34,26 +34,32 @@ defmodule Website.ImageAnalyzer do
         {:ok, file_data} ->
           case ExImageInfo.info(file_data) do
             {_format, width, height, _variant} -> {width, height}
-            _ -> {1200, 1200}  # fallback if image info can't be parsed
+            # fallback if image info can't be parsed
+            _ -> {1200, 1200}
           end
-        {:error, _} -> {1200, 1200}  # fallback if file can't be read
+
+        # fallback if file can't be read
+        {:error, _} ->
+          {1200, 1200}
       end
     rescue
-      _ -> {1200, 1200}  # fallback for any other errors
+      # fallback for any other errors
+      _ -> {1200, 1200}
     end
   end
 
   # Estimates priority score based on content hints
   defp estimate_priority_score(filename, description, _category) do
     base_score = 5
-    
-    score = base_score
-    |> add_if_contains(filename, ["wedding", "surprised"], 3)
-    |> add_if_contains(filename, ["with_"], 2)
-    |> add_if_contains(description, ["wedding", "best", "coolest"], 2)
-    |> add_if_contains(filename, ["me_cool"], 2)
-    |> subtract_if_contains(filename, ["general", "curry"], 1)
-    
+
+    score =
+      base_score
+      |> add_if_contains(filename, ["wedding", "surprised"], 3)
+      |> add_if_contains(filename, ["with_"], 2)
+      |> add_if_contains(description, ["wedding", "best", "coolest"], 2)
+      |> add_if_contains(filename, ["me_cool"], 2)
+      |> subtract_if_contains(filename, ["general", "curry"], 1)
+
     # Ensure score is within valid range
     max(1, min(10, score))
   end
@@ -62,15 +68,18 @@ defmodule Website.ImageAnalyzer do
   defp estimate_visual_weight(filename, description, category) do
     cond do
       # Heavy weight for important moments
-      String.contains?(filename, ["wedding", "surprised"]) or 
-      String.contains?(description, ["wedding", "coolest"]) -> "heavy"
-      
+      String.contains?(filename, ["wedding", "surprised"]) or
+          String.contains?(description, ["wedding", "coolest"]) ->
+        "heavy"
+
       # Light weight for food/simple shots
-      category == "Cooking" or 
-      String.contains?(filename, ["curry", "soup", "pasta"]) -> "light"
-      
+      category == "Cooking" or
+          String.contains?(filename, ["curry", "soup", "pasta"]) ->
+        "light"
+
       # Default to medium
-      true -> "medium"
+      true ->
+        "medium"
     end
   end
 
@@ -79,13 +88,10 @@ defmodule Website.ImageAnalyzer do
     cond do
       # Group photos often have subjects in center-right
       String.contains?(filename, ["with_", "friends", "group"]) -> 0.6
-      
       # Portrait shots usually center
       String.contains?(filename, ["me_"]) -> 0.5
-      
       # Food photos center the dish
       String.contains?(filename, ["beef", "chicken", "curry"]) -> 0.5
-      
       # Default center
       true -> 0.5
     end
@@ -96,13 +102,10 @@ defmodule Website.ImageAnalyzer do
     cond do
       # Face-focused photos have higher focal point
       String.contains?(filename, ["me_", "with_"]) -> 0.35
-      
       # Food photos center vertically
       String.contains?(filename, ["beef", "chicken", "curry", "soup"]) -> 0.5
-      
       # Landscape photos focus on horizon
       String.contains?(filename, ["abu_dhabi"]) -> 0.6
-      
       # Default center
       true -> 0.5
     end

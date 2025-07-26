@@ -6,7 +6,8 @@ defmodule Website.Repo.Migrations.CreatePhotoCategories do
       add :name, :string, null: false
       add :slug, :string, null: false
       add :description, :text
-      add :color, :string, default: "#10b981" # emerald-500
+      # emerald-500
+      add :color, :string, default: "#10b981"
 
       timestamps()
     end

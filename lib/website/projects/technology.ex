@@ -25,7 +25,9 @@ defmodule Website.Projects.Technology do
     technology
     |> cast(attrs, [:name, :slug])
     |> validate_required([:name, :slug])
-    |> validate_format(:slug, ~r/^[a-z0-9-]+$/, message: "must contain only lowercase letters, numbers, and hyphens")
+    |> validate_format(:slug, ~r/^[a-z0-9-]+$/,
+      message: "must contain only lowercase letters, numbers, and hyphens"
+    )
     |> unique_constraint(:slug)
     |> unique_constraint(:name)
   end

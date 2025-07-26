@@ -15,7 +15,10 @@ defmodule Website.Projects.Project do
     field :featured, :boolean, default: false
 
     belongs_to :project_status, Website.Projects.ProjectStatus
-    many_to_many :technologies, Website.Projects.Technology, join_through: "project_technologies", on_replace: :delete
+
+    many_to_many :technologies, Website.Projects.Technology,
+      join_through: "project_technologies",
+      on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
@@ -37,12 +40,18 @@ defmodule Website.Projects.Project do
   # Validates URL format if the field is not nil or empty
   defp validate_url(changeset, field) do
     case get_change(changeset, field) do
-      nil -> changeset
-      "" -> changeset
-      url -> 
+      nil ->
+        changeset
+
+      "" ->
+        changeset
+
+      url ->
         case URI.parse(url) do
-          %URI{scheme: scheme, host: host} when scheme in ["http", "https"] and not is_nil(host) ->
+          %URI{scheme: scheme, host: host}
+          when scheme in ["http", "https"] and not is_nil(host) ->
             changeset
+
           _ ->
             add_error(changeset, field, "must be a valid URL")
         end

@@ -19,10 +19,11 @@ defmodule Website.PhotoLayoutEngine do
   # Mixes photos from different categories for better visual distribution
   defp mix_categories(photos) do
     # Group photos by category name (via association)
-    grouped = Enum.group_by(photos, fn photo -> 
-      if photo.photo_category, do: photo.photo_category.name, else: "Uncategorized"
-    end)
-    
+    grouped =
+      Enum.group_by(photos, fn photo ->
+        if photo.photo_category, do: photo.photo_category.name, else: "Uncategorized"
+      end)
+
     # If only one category or less than 3 photos, return as-is
     if map_size(grouped) <= 1 or length(photos) < 3 do
       photos
@@ -35,12 +36,12 @@ defmodule Website.PhotoLayoutEngine do
   # Interleaves photos from different categories in a round-robin fashion
   defp interleave_categories(grouped_photos) do
     # Convert to list of {category, photos} and sort by category name for consistency
-    category_lists = 
+    category_lists =
       grouped_photos
       |> Enum.to_list()
       |> Enum.sort_by(fn {category, _photos} -> category end)
       |> Enum.map(fn {_category, photos} -> photos end)
-    
+
     # Interleave using round-robin
     round_robin_interleave(category_lists)
   end
@@ -58,22 +59,22 @@ defmodule Website.PhotoLayoutEngine do
   defp round_robin_interleave(lists, acc) do
     # Filter out empty lists first
     non_empty_lists = Enum.filter(lists, &(&1 != []))
-    
+
     # If no non-empty lists remain, we're done
     if non_empty_lists == [] do
       Enum.reverse(acc)
     else
       # Take one item from each non-empty list
-      {items, remaining_lists} = 
+      {items, remaining_lists} =
         non_empty_lists
         |> Enum.reduce({[], []}, fn
-          [head | tail], {items, remaining} -> 
+          [head | tail], {items, remaining} ->
             {[head | items], [tail | remaining]}
         end)
-      
+
       # Add items to accumulator (reverse to maintain round-robin order)
       new_acc = Enum.reverse(items) ++ acc
-      
+
       # Continue with remaining lists
       round_robin_interleave(remaining_lists, new_acc)
     end
@@ -82,7 +83,7 @@ defmodule Website.PhotoLayoutEngine do
   # Assigns initial size class and Tailwind classes based on photo metadata
   defp assign_layout_data({photo, index}) do
     size_class = determine_size_class(photo)
-    
+
     %{
       photo: photo,
       index: index,
@@ -95,14 +96,17 @@ defmodule Website.PhotoLayoutEngine do
   # Determines size class based on aspect ratio: small (1x1), wide (2x1), or tall (1x2)
   defp determine_size_class(photo) do
     aspect_ratio = photo.aspect_ratio || calculate_aspect_ratio(photo)
-    
+
     cond do
       # Wide images (landscape orientation)
-      aspect_ratio > 1.4 -> :wide    # 2x1 units
-      # Tall images (portrait orientation) 
-      aspect_ratio < 0.8 -> :tall    # 1x2 units
+      # 2x1 units
+      aspect_ratio > 1.4 -> :wide
+      # Tall images (portrait orientation)
+      # 1x2 units
+      aspect_ratio < 0.8 -> :tall
       # Square or nearly square images
-      true -> :small                 # 1x1 units
+      # 1x1 units
+      true -> :small
     end
   end
 
@@ -111,29 +115,33 @@ defmodule Website.PhotoLayoutEngine do
     if photo.width && photo.height && photo.height != 0 do
       photo.width / photo.height
     else
-      1.0 # Default to square if no dimensions
+      # Default to square if no dimensions
+      1.0
     end
   end
 
   # Builds Tailwind container classes based on size class
   defp build_container_classes(size_class, _photo) do
     base_classes = "group cursor-pointer"
-    
-    size_classes = case size_class do
-      :wide -> "col-span-2 row-span-1"   # 2x1 units - landscape
-      :tall -> "col-span-1 row-span-2"   # 1x2 units - portrait
-      :small -> "col-span-1 row-span-1"  # 1x1 units - square
-    end
-    
+
+    size_classes =
+      case size_class do
+        # 2x1 units - landscape
+        :wide -> "col-span-2 row-span-1"
+        # 1x2 units - portrait
+        :tall -> "col-span-1 row-span-2"
+        # 1x1 units - square
+        :small -> "col-span-1 row-span-1"
+      end
+
     "#{base_classes} #{size_classes}"
   end
-
 
   # Builds image classes including focal point positioning
   defp build_image_classes(photo) do
     base_classes = "object-cover w-full h-full"
     position_class = get_object_position_class(photo)
-    
+
     "#{base_classes} #{position_class}"
   end
 
@@ -141,23 +149,20 @@ defmodule Website.PhotoLayoutEngine do
   defp get_object_position_class(photo) do
     x = photo.focal_point_x || 0.5
     y = photo.focal_point_y || 0.5
-    
+
     cond do
       # Center region (0.4-0.6)
       x >= 0.4 and x <= 0.6 and y >= 0.4 and y <= 0.6 -> "object-center"
-      
       # Corner regions
       x < 0.4 and y < 0.4 -> "object-left-top"
       x > 0.6 and y < 0.4 -> "object-right-top"
       x < 0.4 and y > 0.6 -> "object-left-bottom"
       x > 0.6 and y > 0.6 -> "object-right-bottom"
-      
       # Edge regions
       x < 0.4 -> "object-left"
       x > 0.6 -> "object-right"
       y < 0.4 -> "object-top"
       y > 0.6 -> "object-bottom"
-      
       # Fallback to center
       true -> "object-center"
     end

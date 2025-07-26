@@ -1,4 +1,10 @@
 defmodule Website.Accounts.User do
+  @moduledoc """
+  User schema for account management and authentication.
+
+  Handles user registration, email validation, password management,
+  and account confirmation with secure password hashing.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

@@ -1,7 +1,7 @@
 defmodule Website.Gallery do
   @moduledoc """
   The Gallery context.
-  
+
   This context handles all photo gallery functionality including photos and photo categories.
   It provides optimized queries for gallery display, photo management, and category organization
   with proper preloading strategies to avoid N+1 queries.
@@ -24,14 +24,14 @@ defmodule Website.Gallery do
   """
   def list_photos do
     Photo
-    |> order_by([p], [desc: p.priority_score, desc: p.inserted_at])
+    |> order_by([p], desc: p.priority_score, desc: p.inserted_at)
     |> preload(:photo_category)
     |> Repo.all()
   end
 
   @doc """
   Returns photos filtered by category with preloaded associations.
-  
+
   Pass "All" or nil for all photos.
 
   ## Examples
@@ -51,7 +51,7 @@ defmodule Website.Gallery do
     Photo
     |> join(:inner, [p], c in assoc(p, :photo_category))
     |> where([p, c], c.name == ^category_name)
-    |> order_by([p], [desc: p.priority_score, desc: p.inserted_at])
+    |> order_by([p], desc: p.priority_score, desc: p.inserted_at)
     |> preload(:photo_category)
     |> Repo.all()
   end
@@ -68,7 +68,7 @@ defmodule Website.Gallery do
   def list_photos_by_category_id(category_id) do
     Photo
     |> where([p], p.photo_category_id == ^category_id)
-    |> order_by([p], [desc: p.priority_score, desc: p.inserted_at])
+    |> order_by([p], desc: p.priority_score, desc: p.inserted_at)
     |> preload(:photo_category)
     |> Repo.all()
   end
@@ -237,12 +237,12 @@ defmodule Website.Gallery do
 
   """
   def get_category_names_with_all do
-    category_names = 
+    category_names =
       PhotoCategory
       |> select([c], c.name)
       |> order_by([c], c.name)
       |> Repo.all()
-    
+
     ["All" | category_names]
   end
 

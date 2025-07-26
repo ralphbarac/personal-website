@@ -1,4 +1,10 @@
 defmodule WebsiteWeb.UserAuth do
+  @moduledoc """
+  User authentication and session management for the website.
+
+  Provides functions for user login/logout, session token management,
+  remember me functionality, and LiveView authentication hooks.
+  """
   use WebsiteWeb, :verified_routes
 
   import Plug.Conn

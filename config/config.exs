@@ -64,12 +64,16 @@ config :phoenix, :json_library, Jason
 # RSS Feed Configuration
 config :website, :rss,
   title: "Ralph Barac's Blog",
-  description: "Thoughts, tutorials, and insights about software development, technology, and continuous learning",
+  description:
+    "Thoughts, tutorials, and insights about software development, technology, and continuous learning",
   max_items: 20,
-  cache_ttl: 3600,  # 1 hour
+  # 1 hour
+  cache_ttl: 3600,
   language: "en-us",
-  managing_editor: "ralph@ralphbarac.com",  # Update with actual email
-  webmaster: "ralph@ralphbarac.com"        # Update with actual email
+  # Update with actual email
+  managing_editor: "ralph@ralphbarac.com",
+  # Update with actual email
+  webmaster: "ralph@ralphbarac.com"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

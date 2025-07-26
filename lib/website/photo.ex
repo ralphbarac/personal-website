@@ -33,15 +33,26 @@ defmodule Website.Photo do
   """
   def changeset(photo, attrs, opts \\ []) do
     require_image_path = Keyword.get(opts, :require_image_path, photo.id == nil)
-    
-    required_fields = case require_image_path do
-      true -> [:description, :image_path, :photo_category_id]
-      false -> [:description, :photo_category_id]
-    end
+
+    required_fields =
+      case require_image_path do
+        true -> [:description, :image_path, :photo_category_id]
+        false -> [:description, :photo_category_id]
+      end
 
     photo
-    |> cast(attrs, [:description, :image_path, :width, :height, :aspect_ratio, 
-                    :priority_score, :visual_weight, :focal_point_x, :focal_point_y, :photo_category_id])
+    |> cast(attrs, [
+      :description,
+      :image_path,
+      :width,
+      :height,
+      :aspect_ratio,
+      :priority_score,
+      :visual_weight,
+      :focal_point_x,
+      :focal_point_y,
+      :photo_category_id
+    ])
     |> validate_required(required_fields)
     |> validate_inclusion(:visual_weight, @valid_visual_weights)
     |> validate_number(:priority_score, greater_than_or_equal_to: 1, less_than_or_equal_to: 10)
@@ -63,7 +74,7 @@ defmodule Website.Photo do
   defp maybe_calculate_aspect_ratio(changeset) do
     width = get_change(changeset, :width)
     height = get_change(changeset, :height)
-    
+
     if width && height && height != 0 do
       put_change(changeset, :aspect_ratio, width / height)
     else

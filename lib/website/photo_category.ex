@@ -26,21 +26,24 @@ defmodule Website.PhotoCategory do
   """
   def changeset(photo_category, attrs, opts \\ []) do
     auto_generate_slug = Keyword.get(opts, :auto_generate_slug, photo_category.id == nil)
-    
-    changeset = 
+
+    changeset =
       photo_category
       |> cast(attrs, [:name, :slug, :description, :color])
       |> validate_required([:name])
-    
-    changeset = if auto_generate_slug do
-      changeset |> maybe_generate_slug()
-    else
-      changeset
-    end
-    
+
+    changeset =
+      if auto_generate_slug do
+        changeset |> maybe_generate_slug()
+      else
+        changeset
+      end
+
     changeset
     |> validate_required([:slug])
-    |> validate_format(:slug, ~r/^[a-z0-9-]+$/, message: "must contain only lowercase letters, numbers, and hyphens")
+    |> validate_format(:slug, ~r/^[a-z0-9-]+$/,
+      message: "must contain only lowercase letters, numbers, and hyphens"
+    )
     |> validate_format(:color, ~r/^#[0-9a-fA-F]{6}$/, message: "must be a valid hex color")
     |> unique_constraint(:slug)
   end
@@ -61,7 +64,9 @@ defmodule Website.PhotoCategory do
           nil -> changeset
           name -> put_change(changeset, :slug, slugify(name))
         end
-      _slug -> changeset
+
+      _slug ->
+        changeset
     end
   end
 

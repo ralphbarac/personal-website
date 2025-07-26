@@ -7,6 +7,9 @@ defmodule Website.Application do
 
   @impl true
   def start(_type, _args) do
+    # Validate configuration before starting any processes
+    Website.Config.validate_config!()
+
     children = [
       WebsiteWeb.Telemetry,
       Website.Repo,

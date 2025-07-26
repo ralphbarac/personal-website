@@ -1,4 +1,10 @@
 defmodule Website.Accounts.UserToken do
+  @moduledoc """
+  User token schema for authentication and authorization.
+
+  Manages session tokens, email verification tokens, password reset tokens,
+  and email change tokens with proper expiration and security measures.
+  """
   use Ecto.Schema
   import Ecto.Query
   alias Website.Accounts.UserToken

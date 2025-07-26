@@ -33,7 +33,16 @@ defmodule Website.Blog.Post do
   """
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:title, :body, :slug, :description, :image_path, :read_time, :category_id, :status])
+    |> cast(attrs, [
+      :title,
+      :body,
+      :slug,
+      :description,
+      :image_path,
+      :read_time,
+      :category_id,
+      :status
+    ])
     |> validate_required([:title, :body, :description, :category_id])
     |> validate_inclusion(:status, @valid_statuses)
     |> generate_slug()
@@ -55,25 +64,32 @@ defmodule Website.Blog.Post do
     case get_field(changeset, :slug) do
       nil ->
         title = get_field(changeset, :title)
+
         if title do
-          slug = title |> String.downcase() |> String.replace(~r/[^\w\s]/, "") |> String.replace(~r/\s+/, "-")
+          slug =
+            title
+            |> String.downcase()
+            |> String.replace(~r/[^\w\s]/, "")
+            |> String.replace(~r/\s+/, "-")
+
           put_change(changeset, :slug, slug)
         else
           changeset
         end
+
       _ ->
         changeset
     end
   end
 
-    # TODO: This could be refactored into a more general helper for strings/times.
-    def format_read_time(%__MODULE__{read_time: minutes}) when is_integer(minutes) do
-      if minutes == 1 do
-        "1 minute"
-      else
-        "#{minutes} minutes"
-      end
-    end
+  @doc """
+  Formats the read time for a blog post.
+
+  Uses the general format helper for consistent time formatting.
+  """
+  def format_read_time(%__MODULE__{read_time: minutes}) when is_integer(minutes) do
+    Website.Utils.FormatHelpers.format_minutes(minutes)
+  end
 
   defp calculate_read_time(changeset) do
     body = get_field(changeset, :body) || ""

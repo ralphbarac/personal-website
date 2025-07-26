@@ -1,14 +1,19 @@
 import Config
 
-# Configure your database
+# Development-specific RSS configuration overrides
+config :website, :rss_env_overrides,
+  # 5 minutes for development (faster refresh)
+  cache_ttl: 300
+
+# Configure your database - use environment variables with secure defaults
 config :website, Website.Repo,
-  username: "postgres",
-  password: "postgres",
-  hostname: "localhost",
-  database: "website_dev",
+  username: System.get_env("DB_USERNAME", "postgres"),
+  password: System.get_env("DB_PASSWORD", "postgres"),
+  hostname: System.get_env("DB_HOSTNAME", "localhost"),
+  database: System.get_env("DB_NAME", "website_dev"),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: String.to_integer(System.get_env("DB_POOL_SIZE", "10"))
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -23,7 +28,11 @@ config :website, WebsiteWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "eIDwpAXyYguiqHBES3u391+pH09ix8G4MnMZ6kNT81e1XMcGAJ9quJUhx1tVuO5j",
+  secret_key_base:
+    System.get_env(
+      "SECRET_KEY_BASE",
+      "eIDwpAXyYguiqHBES3u391+pH09ix8G4MnMZ6kNT81e1XMcGAJ9quJUhx1tVuO5j"
+    ),
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:website, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:website, ~w(--watch)]}

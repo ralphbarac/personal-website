@@ -689,8 +689,12 @@ defmodule WebsiteWeb.CoreComponents do
           <%= @label %>
         </label>
       <% end %>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id={"markdown-editor-#{@field.field}"} phx-hook="MarkdownEditor">
+
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-4"
+        id={"markdown-editor-#{@field.field}"}
+        phx-hook="MarkdownEditor"
+      >
         <!-- Editor -->
         <div class="space-y-2">
           <div class="flex items-center justify-between">
@@ -710,7 +714,6 @@ defmodule WebsiteWeb.CoreComponents do
             class="font-mono text-sm resize-none border-slate-300 focus:border-emerald-500 focus:ring-emerald-500"
           />
         </div>
-
         <!-- Preview -->
         <div class="space-y-2">
           <span class="text-xs font-medium text-slate-600">Live Preview</span>
@@ -719,7 +722,7 @@ defmodule WebsiteWeb.CoreComponents do
           </div>
         </div>
       </div>
-      
+
       <p class="mt-2 text-xs text-slate-500">
         Supports Markdown syntax: headings (#), bold (**bold**), italic (*italic*), links ([text](url)), code (`code`), and lists (- item).
       </p>
@@ -748,25 +751,277 @@ defmodule WebsiteWeb.CoreComponents do
           <%= @label %>
         </label>
       <% end %>
-      
+
       <div id={"trix-editor-#{@field.field}"} phx-hook="TrixEditor" phx-update="ignore">
-        <input 
-          type="hidden" 
-          name={@field.name} 
-          id={"#{@field.field}_trix_input"} 
+        <input
+          type="hidden"
+          name={@field.name}
+          id={"#{@field.field}_trix_input"}
           value={Phoenix.HTML.Form.normalize_value("hidden", @field.value)}
         />
-        <trix-editor 
+        <trix-editor
           input={"#{@field.field}_trix_input"}
           class="block w-full rounded-md border-slate-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 min-h-[300px]"
           placeholder={@placeholder}
-        ></trix-editor>
+        >
+        </trix-editor>
       </div>
-      
+
       <p class="mt-2 text-xs text-slate-500">
         Use the toolbar to format your content with bold, italic, links, lists, and more.
       </p>
     </div>
+    """
+  end
+
+  @doc """
+  Renders floating decorative background elements for public pages.
+
+  This component provides consistent decorative elements across all public-facing pages
+  including blob shapes and organic forms with subtle animations.
+
+  ## Examples
+
+      <.floating_decorations />
+      
+  This will render the standard set of decorative elements used across
+  the homepage, about, work, blog, and projects pages.
+  """
+  @spec floating_decorations(map()) :: Phoenix.LiveView.Rendered.t()
+  def floating_decorations(assigns) do
+    ~H"""
+    <!-- Floating decorative elements -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <!-- Blob shapes with animation -->
+      <div class="absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-emerald-400 to-teal-400 blob opacity-20 float-slow">
+      </div>
+      <div class="absolute top-40 right-20 w-24 h-24 bg-gradient-to-r from-teal-400 to-emerald-400 blob-2 opacity-25 float-medium">
+      </div>
+      <div class="absolute bottom-32 left-1/4 w-20 h-20 bg-gradient-to-r from-lime-400 to-green-400 blob opacity-30 float-slow">
+      </div>
+      <!-- Organic shapes -->
+      <div
+        class="absolute top-1/4 right-10 w-16 h-40 bg-gradient-to-b from-orange-200 to-amber-200 opacity-40 transform rotate-12"
+        style="border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;"
+      >
+      </div>
+      <div
+        class="absolute bottom-20 right-1/3 w-28 h-28 bg-gradient-to-br from-emerald-200 to-teal-300 opacity-35 transform -rotate-6"
+        style="border-radius: 73% 27% 35% 65% / 28% 67% 33% 72%;"
+      >
+      </div>
+      <div
+        class="absolute top-1/2 left-1/4 w-12 h-24 bg-gradient-to-b from-orange-200 to-amber-200 opacity-30 transform rotate-12"
+        style="border-radius: 60% 40% 70% 30% / 80% 20% 60% 40%;"
+      >
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders consistent admin page header with title, description and actions.
+
+  ## Examples
+
+      <.admin_header title="Project Management" description="Create and manage portfolio projects">
+        <.link navigate="/admin" class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700">
+          Back to Admin
+        </.link>
+      </.admin_header>
+      
+  """
+  attr :title, :string, required: true
+  attr :description, :string, default: nil
+  slot :inner_block, required: false
+
+  @spec admin_header(map()) :: Phoenix.LiveView.Rendered.t()
+  def admin_header(assigns) do
+    ~H"""
+    <div class="bg-white shadow-sm border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="py-6 flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold text-slate-900"><%= @title %></h1>
+            <p :if={@description} class="mt-2 text-slate-600"><%= @description %></p>
+          </div>
+          <div :if={@inner_block != []}>
+            <%= render_slot(@inner_block) %>
+          </div>
+        </div>
+      </div>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a status badge with consistent styling based on status type.
+
+  ## Examples
+
+      <.status_badge status="published" />
+      <.status_badge status="draft" />
+      <.status_badge status="Live" type="project" />
+      
+  """
+  attr :status, :string, required: true
+  attr :type, :string, default: "post"
+
+  @spec status_badge(map()) :: Phoenix.LiveView.Rendered.t()
+  def status_badge(assigns) do
+    ~H"""
+    <span class={[
+      "text-xs font-medium px-2 py-1 rounded-full",
+      case {@status, @type} do
+        {"published", "post"} -> "bg-green-100 text-green-800"
+        {"draft", "post"} -> "bg-yellow-100 text-yellow-800"
+        {"Live", "project"} -> "bg-green-100 text-green-800"
+        {"In Development", "project"} -> "bg-orange-100 text-orange-800"
+        {"Completed", "project"} -> "bg-blue-100 text-blue-800"
+        _ -> "bg-slate-100 text-slate-800"
+      end
+    ]}>
+      <%= String.capitalize(to_string(@status)) %>
+    </span>
+    """
+  end
+
+  @doc """
+  Renders a technology badge with consistent styling.
+
+  ## Examples
+
+      <.technology_badge name="React" />
+      <.technology_badge name="Elixir" />
+      
+  """
+  attr :name, :string, required: true
+
+  @spec technology_badge(map()) :: Phoenix.LiveView.Rendered.t()
+  def technology_badge(assigns) do
+    ~H"""
+    <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-sm font-medium">
+      <%= @name %>
+    </span>
+    """
+  end
+
+  @doc """
+  Renders a loading spinner for async operations.
+
+  ## Examples
+
+      <.loading_spinner />
+      <.loading_spinner size="lg" />
+      
+  """
+  attr :size, :string, default: "md"
+
+  @spec loading_spinner(map()) :: Phoenix.LiveView.Rendered.t()
+  def loading_spinner(assigns) do
+    ~H"""
+    <div
+      class={[
+        "inline-block animate-spin rounded-full border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]",
+        case @size do
+          "sm" -> "h-4 w-4 border-2"
+          "md" -> "h-6 w-6 border-2"
+          "lg" -> "h-8 w-8 border-4"
+          "xl" -> "h-12 w-12 border-4"
+        end
+      ]}
+      role="status"
+      aria-label="Loading"
+    >
+      <span class="sr-only">Loading...</span>
+    </div>
+    """
+  end
+
+  @doc """
+  Renders a confirmation modal for destructive actions.
+
+  ## Examples
+
+      <.confirmation_modal 
+        id="delete-confirmation"
+        title="Delete Post"
+        message="Are you sure you want to delete this post? This action cannot be undone."
+        confirm_text="Delete"
+        cancel_text="Cancel"
+        danger={true}
+        on_confirm={JS.push("delete_post", value: %{id: @post.id})}
+      />
+      
+  """
+  attr :id, :string, required: true
+  attr :title, :string, required: true
+  attr :message, :string, required: true
+  attr :confirm_text, :string, default: "Confirm"
+  attr :cancel_text, :string, default: "Cancel"
+  attr :danger, :boolean, default: false
+  attr :on_confirm, JS, default: %JS{}
+
+  @spec confirmation_modal(map()) :: Phoenix.LiveView.Rendered.t()
+  def confirmation_modal(assigns) do
+    ~H"""
+    <.modal id={@id}>
+      <div class="p-6">
+        <div class="flex items-center mb-4">
+          <div class={[
+            "flex-shrink-0 w-10 h-10 mx-auto flex items-center justify-center rounded-full",
+            if(@danger, do: "bg-red-100", else: "bg-yellow-100")
+          ]}>
+            <svg
+              class={[
+                "w-6 h-6",
+                if(@danger, do: "text-red-600", else: "text-yellow-600")
+              ]}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <h3 class="text-lg font-medium text-slate-900"><%= @title %></h3>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <p class="text-sm text-slate-500"><%= @message %></p>
+        </div>
+
+        <div class="flex gap-3 justify-end">
+          <button
+            type="button"
+            phx-click={hide_modal(@id)}
+            class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+          >
+            <%= @cancel_text %>
+          </button>
+          <button
+            type="button"
+            phx-click={JS.exec(@on_confirm, "phx-remove") |> hide_modal(@id)}
+            class={[
+              "px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2",
+              if(@danger,
+                do: "bg-red-600 hover:bg-red-700 focus:ring-red-500",
+                else: "bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500"
+              )
+            ]}
+          >
+            <%= @confirm_text %>
+          </button>
+        </div>
+      </div>
+    </.modal>
     """
   end
 

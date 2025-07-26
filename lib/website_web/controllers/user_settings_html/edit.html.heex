@@ -9,9 +9,14 @@
             <span class="text-slate-900">Settings</span>
           </nav>
           <h1 class="text-3xl font-bold text-slate-900">Account Settings</h1>
-          <p class="mt-2 text-slate-600">Manage your account email address and password settings</p>
+          <p class="mt-2 text-slate-600">
+            Manage your account email address and password settings
+          </p>
         </div>
-        <.link navigate="/admin" class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700">
+        <.link
+          navigate="/admin"
+          class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700"
+        >
           Back to Admin
         </.link>
       </div>
@@ -23,7 +28,12 @@
       <!-- Email Settings Card -->
       <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
         <h2 class="text-xl font-semibold text-slate-900 mb-4">Email Settings</h2>
-        <.simple_form :let={f} for={@email_changeset} action={~p"/users/settings"} id="update_email">
+        <.simple_form
+          :let={f}
+          for={@email_changeset}
+          action={~p"/users/settings"}
+          id="update_email"
+        >
           <.error :if={@email_changeset.action}>
             Oops, something went wrong! Please check the errors below.
           </.error>
@@ -44,7 +54,6 @@
           </:actions>
         </.simple_form>
       </div>
-
       <!-- Password Settings Card -->
       <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
         <h2 class="text-xl font-semibold text-slate-900 mb-4">Password Settings</h2>

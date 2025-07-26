@@ -16,7 +16,11 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
       |> assign(:post, post)
       |> assign(:changeset, changeset)
       |> assign(:categories, categories)
-      |> allow_upload(:featured_image, accept: ~w(.jpg .jpeg .png .gif), max_entries: 1, max_file_size: 5_000_000)
+      |> allow_upload(:featured_image,
+        accept: ~w(.jpg .jpeg .png .gif),
+        max_entries: 1,
+        max_file_size: 5_000_000
+      )
 
     {:ok, socket}
   end
@@ -37,21 +41,23 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
 
   def handle_event("save", %{"post" => post_params}, socket) do
     # Handle image upload
-    uploaded_files = consume_uploaded_entries(socket, :featured_image, fn %{path: path}, entry ->
-      filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
-      dest = Path.join([@blog_uploads_dir, filename])
-      
-      File.mkdir_p!(Path.dirname(dest))
-      File.cp!(path, dest)
-      
-      {:ok, "/images/blog/uploads/#{filename}"}
-    end)
+    uploaded_files =
+      consume_uploaded_entries(socket, :featured_image, fn %{path: path}, entry ->
+        filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
+        dest = Path.join([@blog_uploads_dir, filename])
+
+        File.mkdir_p!(Path.dirname(dest))
+        File.cp!(path, dest)
+
+        {:ok, "/images/blog/uploads/#{filename}"}
+      end)
 
     # Add image path to post params if an image was uploaded, otherwise keep existing
-    final_post_params = case uploaded_files do
-      [image_path] -> Map.put(post_params, "image_path", image_path)
-      [] -> post_params
-    end
+    final_post_params =
+      case uploaded_files do
+        [image_path] -> Map.put(post_params, "image_path", image_path)
+        [] -> post_params
+      end
 
     case Blog.update_post(socket.assigns.post, final_post_params) do
       {:ok, post} ->
@@ -105,17 +111,24 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
               </div>
             </div>
             <div class="flex items-center space-x-3">
-              <.link navigate={~p"/blog/posts/#{@post.id}"} target="_blank" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+              <.link
+                navigate={~p"/blog/posts/#{@post.id}"}
+                target="_blank"
+                class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
                 View Post →
               </.link>
-              <button 
+              <button
                 phx-click="delete"
                 data-confirm="Are you sure you want to delete this post? This action cannot be undone."
                 class="inline-flex items-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50"
               >
                 Delete Post
               </button>
-              <.link navigate="/admin" class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700">
+              <.link
+                navigate="/admin"
+                class="bg-slate-600 text-white px-4 py-2 rounded-lg hover:bg-slate-700"
+              >
                 Back to Admin
               </.link>
             </div>
@@ -129,19 +142,26 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
               <span class="font-medium text-blue-900">Created:</span>
-              <span class="text-blue-700"><%= Calendar.strftime(@post.inserted_at, "%B %d, %Y at %I:%M %p") %></span>
+              <span class="text-blue-700">
+                <%= Calendar.strftime(@post.inserted_at, "%B %d, %Y at %I:%M %p") %>
+              </span>
             </div>
             <div>
               <span class="font-medium text-blue-900">Updated:</span>
-              <span class="text-blue-700"><%= Calendar.strftime(@post.updated_at, "%B %d, %Y at %I:%M %p") %></span>
+              <span class="text-blue-700">
+                <%= Calendar.strftime(@post.updated_at, "%B %d, %Y at %I:%M %p") %>
+              </span>
             </div>
             <div>
               <span class="font-medium text-blue-900">Current Status:</span>
               <span class={[
                 "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ml-2",
-                if(@post.status == :published, do: "bg-green-100 text-green-800", else: "bg-yellow-100 text-yellow-800")
+                if(@post.status == :published,
+                  do: "bg-green-100 text-green-800",
+                  else: "bg-yellow-100 text-yellow-800"
+                )
               ]}>
-                <%= String.capitalize(@post.status) %>
+                <%= @post.status |> Atom.to_string() |> String.capitalize() %>
               </span>
             </div>
           </div>
@@ -155,122 +175,113 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
                 <label class="block text-sm font-medium text-slate-700 mb-2">
                   Title <span class="text-red-500">*</span>
                 </label>
-                <.input 
-                  field={f[:title]} 
-                  type="text" 
-                  placeholder="Enter post title..."
-                />
+                <.input field={f[:title]} type="text" placeholder="Enter post title..." />
               </div>
-
               <!-- Slug -->
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">
                   Slug <span class="text-red-500">*</span>
                 </label>
-                <.input 
-                  field={f[:slug]} 
-                  type="text" 
-                  placeholder="auto-generated-from-title"
-                />
+                <.input field={f[:slug]} type="text" placeholder="auto-generated-from-title" />
                 <p class="mt-1 text-xs text-slate-500">URL-friendly version of the title</p>
               </div>
-
               <!-- Category -->
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">
                   Category <span class="text-red-500">*</span>
                 </label>
-                <.input 
-                  field={f[:category_id]} 
-                  type="select" 
+                <.input
+                  field={f[:category_id]}
+                  type="select"
                   options={Enum.map(@categories, &{&1.name, &1.id})}
                 />
               </div>
-
               <!-- Description -->
               <div class="lg:col-span-2">
                 <label class="block text-sm font-medium text-slate-700 mb-2">
                   Description <span class="text-red-500">*</span>
                 </label>
-                <.input 
-                  field={f[:description]} 
-                  type="textarea" 
+                <.input
+                  field={f[:description]}
+                  type="textarea"
                   rows="3"
                   placeholder="Brief description for SEO and preview..."
                 />
-                <p class="mt-1 text-xs text-slate-500">This appears in search results and post previews</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  This appears in search results and post previews
+                </p>
               </div>
-
               <!-- Featured Image Upload -->
               <div class="lg:col-span-2">
                 <label class="block text-sm font-medium text-slate-700 mb-2">
                   Featured Image <span class="text-red-500">*</span>
                 </label>
-                
                 <!-- Current Image Preview -->
                 <%= if @post.image_path do %>
                   <div class="mb-4 p-4 bg-slate-50 rounded-lg">
                     <p class="text-sm font-medium text-slate-700 mb-2">Current Image:</p>
-                    <img src={@post.image_path} alt="Current featured image" class="max-w-xs h-32 object-cover rounded border" />
+                    <img
+                      src={@post.image_path}
+                      alt="Current featured image"
+                      class="max-w-xs h-32 object-cover rounded border"
+                    />
                     <p class="text-xs text-slate-500 mt-1"><%= @post.image_path %></p>
                   </div>
                 <% end %>
-                
+
                 <div class="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center">
-                  <.live_file_input upload={@uploads.featured_image} class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100" />
+                  <.live_file_input
+                    upload={@uploads.featured_image}
+                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
+                  />
                   <p class="mt-2 text-xs text-slate-500">
                     Upload JPG, PNG, or GIF to replace current image (recommended size: 1200x630px)
                   </p>
                 </div>
-                
+
                 <div :for={entry <- @uploads.featured_image.entries} class="mt-2">
                   <div class="bg-slate-100 rounded p-2 text-sm flex items-center justify-between">
                     <span><%= entry.client_name %> (<%= entry.progress %>%)</span>
-                    <button 
-                      type="button" 
-                      phx-click="cancel-upload" 
+                    <button
+                      type="button"
+                      phx-click="cancel-upload"
                       phx-value-ref={entry.ref}
                       class="text-red-600 hover:text-red-800"
                     >
                       Remove
                     </button>
                   </div>
-                  
+
                   <%= for err <- upload_errors(@uploads.featured_image, entry) do %>
                     <div class="text-red-600 text-sm mt-1"><%= error_to_string(err) %></div>
                   <% end %>
                 </div>
-                
+
                 <%= for err <- upload_errors(@uploads.featured_image) do %>
                   <div class="text-red-600 text-sm mt-1"><%= error_to_string(err) %></div>
                 <% end %>
-                
                 <!-- Fallback: Manual Image Path -->
                 <div class="mt-4">
                   <label class="block text-sm font-medium text-slate-700 mb-2">
                     Or update image path manually
                   </label>
-                  <.input 
-                    field={f[:image_path]} 
-                    type="text" 
-                    placeholder="/images/blog/my-post.jpg"
-                  />
-                  <p class="mt-1 text-xs text-slate-500">Use this if you prefer to host images elsewhere</p>
+                  <.input field={f[:image_path]} type="text" placeholder="/images/blog/my-post.jpg" />
+                  <p class="mt-1 text-xs text-slate-500">
+                    Use this if you prefer to host images elsewhere
+                  </p>
                 </div>
               </div>
-
               <!-- Status -->
               <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">
                   Status
                 </label>
-                <.input 
-                  field={f[:status]} 
-                  type="select" 
+                <.input
+                  field={f[:status]}
+                  type="select"
                   options={[{"Draft", :draft}, {"Published", :published}]}
                 />
               </div>
-
               <!-- Read Time (Display Only) -->
               <div class="lg:col-span-2">
                 <label class="block text-sm font-medium text-slate-700 mb-2">
@@ -279,28 +290,31 @@ defmodule WebsiteWeb.AdminBlogLive.Edit do
                 <div class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-md text-sm text-slate-600">
                   <%= @post.read_time %> minutes
                 </div>
-                <p class="mt-1 text-xs text-slate-500">Based on ~200 words per minute reading speed</p>
+                <p class="mt-1 text-xs text-slate-500">
+                  Based on ~200 words per minute reading speed
+                </p>
               </div>
             </div>
           </div>
-
           <!-- Body Content -->
           <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <.trix_editor 
+            <.trix_editor
               field={f[:body]}
               label="Content *"
               placeholder="Write your post content here..."
             />
           </div>
-
           <!-- Action Buttons -->
           <div class="flex items-center justify-between">
-            <.link navigate="/admin/blog" class="inline-flex items-center px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50">
+            <.link
+              navigate="/admin/blog"
+              class="inline-flex items-center px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50"
+            >
               ← Back to Blog Posts
             </.link>
-            
-            <button 
-              type="submit" 
+
+            <button
+              type="submit"
               class="inline-flex items-center px-6 py-2 bg-emerald-600 text-white font-medium rounded-md shadow-sm hover:bg-emerald-700"
             >
               Update Post

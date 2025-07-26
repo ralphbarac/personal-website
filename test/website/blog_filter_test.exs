@@ -6,48 +6,53 @@ defmodule Website.BlogFilterTest do
   describe "post filtering" do
     setup do
       # Create test category
-      {:ok, category1} = Blog.create_category(%{
-        name: "Tech",
-        slug: "tech",
-        description: "Technology posts"
-      })
+      {:ok, category1} =
+        Blog.create_category(%{
+          name: "Tech",
+          slug: "tech",
+          description: "Technology posts"
+        })
 
-      {:ok, category2} = Blog.create_category(%{
-        name: "Life",
-        slug: "life", 
-        description: "Life posts"
-      })
+      {:ok, category2} =
+        Blog.create_category(%{
+          name: "Life",
+          slug: "life",
+          description: "Life posts"
+        })
 
       # Create test posts
-      {:ok, post1} = Blog.create_post(%{
-        title: "Elixir Guide",
-        body: "Content about Elixir",
-        slug: "elixir-guide",
-        description: "Learn Elixir",
-        status: :published,
-        category_id: category1.id,
-        image_path: "/images/blog/elixir.jpg"
-      })
+      {:ok, post1} =
+        Blog.create_post(%{
+          title: "Elixir Guide",
+          body: "Content about Elixir",
+          slug: "elixir-guide",
+          description: "Learn Elixir",
+          status: :published,
+          category_id: category1.id,
+          image_path: "/images/blog/elixir.jpg"
+        })
 
-      {:ok, post2} = Blog.create_post(%{
-        title: "Life Update",
-        body: "Personal update",
-        slug: "life-update", 
-        description: "Personal thoughts",
-        status: :draft,
-        category_id: category2.id,
-        image_path: "/images/blog/life.jpg"
-      })
+      {:ok, post2} =
+        Blog.create_post(%{
+          title: "Life Update",
+          body: "Personal update",
+          slug: "life-update",
+          description: "Personal thoughts",
+          status: :draft,
+          category_id: category2.id,
+          image_path: "/images/blog/life.jpg"
+        })
 
-      {:ok, post3} = Blog.create_post(%{
-        title: "Phoenix Tutorial",
-        body: "Learn Phoenix framework",
-        slug: "phoenix-tutorial",
-        description: "Phoenix guide",
-        status: :published,
-        category_id: category1.id,
-        image_path: "/images/blog/phoenix.jpg"
-      })
+      {:ok, post3} =
+        Blog.create_post(%{
+          title: "Phoenix Tutorial",
+          body: "Learn Phoenix framework",
+          slug: "phoenix-tutorial",
+          description: "Phoenix guide",
+          status: :published,
+          category_id: category1.id,
+          image_path: "/images/blog/phoenix.jpg"
+        })
 
       %{
         category1: category1,

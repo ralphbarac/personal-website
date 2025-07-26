@@ -9,15 +9,24 @@
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
     <link phx-track-static rel="stylesheet" href={~p"/fonts/indie_flower/indie_flower.css"} />
-    
     <!-- RSS Feed autodiscovery -->
     <%= if assigns[:current_path] && String.starts_with?(assigns[:current_path], "/blog") do %>
-      <link rel="alternate" type="application/rss+xml" title="Ralph Barac's Blog" href={url(~p"/feed.xml")} />
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title="Ralph Barac's Blog"
+        href={url(~p"/feed.xml")}
+      />
     <% end %>
     <%= if assigns[:current_path] == "/" do %>
-      <link rel="alternate" type="application/rss+xml" title="Ralph Barac's Blog" href={url(~p"/feed.xml")} />
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title="Ralph Barac's Blog"
+        href={url(~p"/feed.xml")}
+      />
     <% end %>
-    
+
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>

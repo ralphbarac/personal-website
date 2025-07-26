@@ -1,7 +1,7 @@
 defmodule Website.Blog do
   @moduledoc """
   The Blog context.
-  
+
   This context handles all blog-related functionality including posts and categories.
   It provides a unified interface for blog operations with proper query optimization
   and preloading strategies.
@@ -391,20 +391,25 @@ defmodule Website.Blog do
 
   defp filter_by_title(query, nil), do: query
   defp filter_by_title(query, ""), do: query
+
   defp filter_by_title(query, title) do
     from(p in query, where: ilike(p.title, ^"%#{title}%"))
   end
 
   defp filter_by_category(query, nil), do: query
+
   defp filter_by_category(query, category_id) when is_integer(category_id) do
     from(p in query, where: p.category_id == ^category_id)
   end
+
   defp filter_by_category(query, _), do: query
 
   defp filter_by_status(query, nil), do: query
+
   defp filter_by_status(query, status) when status in [:draft, :published] do
     from(p in query, where: p.status == ^status)
   end
+
   defp filter_by_status(query, _), do: query
 
   defp has_posts?(category_id) do

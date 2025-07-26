@@ -26,7 +26,9 @@ defmodule Website.Projects.ProjectStatus do
     project_status
     |> cast(attrs, [:name, :slug, :description])
     |> validate_required([:name, :slug, :description])
-    |> validate_format(:slug, ~r/^[a-z0-9-]+$/, message: "must contain only lowercase letters, numbers, and hyphens")
+    |> validate_format(:slug, ~r/^[a-z0-9-]+$/,
+      message: "must contain only lowercase letters, numbers, and hyphens"
+    )
     |> unique_constraint(:slug)
     |> unique_constraint(:name)
   end
