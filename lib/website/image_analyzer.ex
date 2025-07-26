@@ -29,22 +29,46 @@ defmodule Website.ImageAnalyzer do
 
   # Gets real image dimensions from file headers using ex_image_info
   defp get_real_dimensions(image_path) do
+    # Convert web path (/images/file.jpg) to filesystem path (priv/static/images/file.jpg)
+    file_path = resolve_file_path(image_path)
+    
     try do
-      case File.read(image_path) do
+      case File.read(file_path) do
         {:ok, file_data} ->
           case ExImageInfo.info(file_data) do
-            {_format, width, height, _variant} -> {width, height}
+            {_format, width, height, _variant} -> 
+              {width, height}
             # fallback if image info can't be parsed
-            _ -> {1200, 1200}
+            _ -> 
+              require Logger
+              Logger.warning("ExImageInfo could not parse image: #{file_path}")
+              {1200, 1200}
           end
 
         # fallback if file can't be read
-        {:error, _} ->
+        {:error, reason} ->
+          require Logger
+          Logger.warning("Could not read image file: #{file_path}, reason: #{inspect(reason)}")
           {1200, 1200}
       end
     rescue
-      # fallback for any other errors
-      _ -> {1200, 1200}
+      error ->
+        require Logger
+        Logger.warning("ImageAnalyzer error for #{file_path}: #{inspect(error)}")
+        {1200, 1200}
+    end
+  end
+
+  # Converts web paths (/images/file.jpg) to filesystem paths (priv/static/images/file.jpg)
+  defp resolve_file_path(image_path) do
+    case Application.get_env(:website, :env) do
+      :prod ->
+        # In production, use Application.app_dir to get the correct path
+        static_path = Path.join([Application.app_dir(:website), "priv", "static"])
+        Path.join(static_path, String.trim_leading(image_path, "/"))
+      _ ->
+        # In development/test, use relative path from project root
+        Path.join("priv/static", String.trim_leading(image_path, "/"))
     end
   end
 
