@@ -16,7 +16,7 @@ config :website, WebsiteWeb.Endpoint,
   # Enable gzip compression for all static assets
   gzip: true,
   # Force SSL in production
-  force_ssl: [hsts: true],
+  force_ssl: [rewrite_on: [:x_forwarded_proto], hsts: true],
   # Set security headers
   secure_browser_headers: %{
     "content-security-policy" =>
