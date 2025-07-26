@@ -30,6 +30,17 @@ defmodule Website.Gallery do
   end
 
   @doc """
+  Returns all photos ordered by insertion date (newest first) with preloaded categories.
+  Used for admin interfaces where chronological order is preferred.
+  """
+  def list_photos_by_date do
+    Photo
+    |> order_by([p], desc: p.inserted_at)
+    |> preload(:photo_category)
+    |> Repo.all()
+  end
+
+  @doc """
   Returns photos filtered by category with preloaded associations.
 
   Pass "All" or nil for all photos.

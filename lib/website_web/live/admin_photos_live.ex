@@ -7,7 +7,7 @@ defmodule WebsiteWeb.AdminPhotosLive do
   @uploads_dir "priv/static/images"
 
   def mount(_params, _session, socket) do
-    photos = Repo.all(from p in Photo, order_by: [desc: p.id], preload: [:photo_category])
+    photos = Gallery.list_photos_by_date()  # Admin view: newest first
     categories = Gallery.list_photo_categories()
 
     socket =
@@ -171,7 +171,7 @@ defmodule WebsiteWeb.AdminPhotosLive do
 
     # Refresh data
     categories = Gallery.list_photo_categories()
-    photos = Repo.all(from p in Photo, order_by: [desc: p.id], preload: [:photo_category])
+    photos = Gallery.list_photos_by_date()  # Admin view: newest first
 
     socket =
       socket
