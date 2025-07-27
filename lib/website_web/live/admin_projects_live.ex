@@ -301,10 +301,32 @@ defmodule WebsiteWeb.AdminProjectsLive do
   # Helper functions for data processing and validation
 
   defp parse_technology_ids(project_params) do
-    Map.get(project_params, "technology_ids", [])
-    |> Enum.filter(&(&1 != ""))
-    |> Enum.map(&parse_integer/1)
-    |> Enum.reject(&is_nil/1)
+    technology_ids = Map.get(project_params, "technology_ids", "")
+    
+    # Handle comma-separated string format from hidden input
+    case technology_ids do
+      # If it's a string (comma-separated), split and parse
+      ids_string when is_binary(ids_string) ->
+        if ids_string == "" do
+          []
+        else
+          ids_string
+          |> String.split(",")
+          |> Enum.filter(&(&1 != ""))
+          |> Enum.map(&parse_integer/1)
+          |> Enum.reject(&is_nil/1)
+        end
+      
+      # If it's already a list, process it (backward compatibility)
+      ids when is_list(ids) ->
+        ids
+        |> Enum.filter(&(&1 != ""))
+        |> Enum.map(&parse_integer/1)
+        |> Enum.reject(&is_nil/1)
+      
+      # Fallback for any other format
+      _ -> []
+    end
   end
 
   defp parse_integer(value) when is_binary(value) do
@@ -499,8 +521,12 @@ defmodule WebsiteWeb.AdminProjectsLive do
 
             <div>
               <label class="block text-sm font-medium text-slate-700 mb-2">Technologies</label>
-              <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-slate-200 rounded p-3">
-                <div :for={{_id, tech} <- @technologies} class="flex items-center">
+              <div 
+                id="project-form-technologies"
+                phx-update="stream"
+                class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-slate-200 rounded p-3"
+              >
+                <div :for={{id, tech} <- @technologies} id={id} class="flex items-center">
                   <input
                     type="checkbox"
                     id={"tech_#{tech.id}"}
@@ -518,9 +544,11 @@ defmodule WebsiteWeb.AdminProjectsLive do
           </div>
         </div>
         <!-- Hidden field to pass selected technology IDs -->
-        <div :for={tech_id <- @selected_technology_ids} class="hidden">
-          <input type="hidden" name="project[technology_ids][]" value={tech_id} />
-        </div>
+        <input 
+          type="hidden" 
+          name="project[technology_ids]" 
+          value={Enum.join(@selected_technology_ids, ",")} 
+        />
 
         <div class="mt-6 flex justify-end gap-2">
           <button
