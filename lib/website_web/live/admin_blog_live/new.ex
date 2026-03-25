@@ -4,7 +4,7 @@ defmodule WebsiteWeb.AdminBlogLive.New do
   alias Website.Blog
   alias Website.Blog.Post
 
-  @blog_uploads_dir "priv/static/images/blog/uploads"
+  defp blog_uploads_dir, do: Application.app_dir(:website, ["priv", "static", "images", "blog", "uploads"])
 
   def mount(_params, _session, socket) do
     categories = Blog.list_categories()
@@ -45,7 +45,7 @@ defmodule WebsiteWeb.AdminBlogLive.New do
     uploaded_files =
       consume_uploaded_entries(socket, :featured_image, fn %{path: path}, entry ->
         filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
-        dest = Path.join([@blog_uploads_dir, filename])
+        dest = Path.join([blog_uploads_dir(), filename])
 
         File.mkdir_p!(Path.dirname(dest))
         File.cp!(path, dest)

@@ -400,6 +400,59 @@ body {
   z-index: 10;
 }
 
+/* Trix editor formatting overrides.
+   Root causes:
+   1. Tailwind Preflight (tailwindcss/base) globally resets ul/ol to list-style:none —
+      Trix's CSS sets margin on li but never restores list-style, making bullets invisible.
+   2. Trix's default h1 is only 1.2em — barely distinguishable from body text.
+   3. Blockquote and pre need visual treatment to match the published post view. */
+
+.trix-content ul {
+  list-style: disc;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.trix-content ol {
+  list-style: decimal;
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.trix-content ul ul {
+  list-style: circle;
+}
+
+.trix-content li {
+  margin: 0.25em 0;
+}
+
+.trix-content h1 {
+  font-size: 1.75em;
+  font-weight: 700;
+  line-height: 1.25;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  color: #0f172a;
+}
+
+.trix-content blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1em;
+  color: #64748b;
+  font-style: italic;
+  margin: 0.75em 0;
+}
+
+.trix-content pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1em;
+  border-radius: 0.375em;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+
 /* Enhanced code block styling for Trix-generated content */
 .prose pre {
   @apply bg-slate-900 text-slate-100 p-6 rounded-xl shadow-lg border border-slate-700 overflow-x-auto relative;

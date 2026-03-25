@@ -51,7 +51,7 @@ defmodule WebsiteWeb.Router do
 
     # Blog functionality
     live "/blog", BlogLive.Index
-    live "/blog/posts/:id", BlogLive.Show
+    live "/blog/posts/:slug", BlogLive.Show
   end
 
   # ============================================================================

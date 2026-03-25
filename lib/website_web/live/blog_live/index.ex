@@ -186,7 +186,7 @@ defmodule WebsiteWeb.BlogLive.Index do
       id={@id}
       class="card group cursor-pointer overflow-hidden h-full bg-white hover:shadow-xl transition-all duration-300 hover:scale-105"
     >
-      <.link navigate={~p"/blog/posts/#{@post}"} class="block h-full">
+      <.link navigate={~p"/blog/posts/#{@post.slug}"} class="block h-full">
         <!-- Featured Image -->
         <div class="relative h-48 overflow-hidden bg-green-50">
           <img

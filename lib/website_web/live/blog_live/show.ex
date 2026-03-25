@@ -12,22 +12,8 @@ defmodule WebsiteWeb.BlogLive.Show do
     {:ok, socket}
   end
 
-  def handle_params(%{"id" => id}, _uri, socket) do
-    # Try to get by slug first, then by ID for backwards compatibility
-    post =
-      try do
-        Blog.get_published_post_by_slug!(id)
-      rescue
-        Ecto.NoResultsError ->
-          # If slug lookup fails, try by ID (but still ensure it's published)
-          post = Blog.get_post!(id)
-
-          if post.status == :published do
-            post
-          else
-            reraise Ecto.NoResultsError, [queryable: Website.Blog.Post], __STACKTRACE__
-          end
-      end
+  def handle_params(%{"slug" => slug}, _uri, socket) do
+    post = Blog.get_published_post_by_slug!(slug)
 
     socket =
       socket

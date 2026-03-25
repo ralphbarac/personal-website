@@ -4,7 +4,7 @@ defmodule WebsiteWeb.AdminPhotosLive do
   alias Website.{Photo, PhotoCategory, Gallery, Repo}
   import Ecto.Query
 
-  @uploads_dir "priv/static/images"
+  defp uploads_dir, do: Application.app_dir(:website, ["priv", "static", "images"])
 
   def mount(_params, _session, socket) do
     photos = Gallery.list_photos_by_date()
@@ -30,7 +30,7 @@ defmodule WebsiteWeb.AdminPhotosLive do
   def handle_event("save", %{"photo" => photo_params}, socket) do
     case consume_uploaded_entries(socket, :image, fn %{path: path}, entry ->
            filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
-           dest = Path.join([@uploads_dir, filename])
+           dest = Path.join([uploads_dir(), filename])
 
            File.mkdir_p!(Path.dirname(dest))
            File.cp!(path, dest)
