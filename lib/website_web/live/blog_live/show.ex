@@ -204,7 +204,6 @@ defmodule WebsiteWeb.BlogLive.Show do
                   prose-em:text-slate-700 prose-em:italic
                   prose-code:text-slate-900 prose-code:bg-slate-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-base prose-code:font-mono prose-code:font-medium
                   prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:p-6 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:text-sm
-                  prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:px-6 prose-blockquote:py-4 prose-blockquote:italic prose-blockquote:text-slate-700 prose-blockquote:my-6
                   prose-ul:my-6 prose-ul:space-y-2 prose-ul:list-disc prose-ul:pl-6
                   prose-ol:my-6 prose-ol:space-y-2 prose-ol:list-decimal prose-ol:pl-6
                   prose-li:text-slate-700 prose-li:leading-relaxed prose-li:text-lg

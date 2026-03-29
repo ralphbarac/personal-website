@@ -437,11 +437,13 @@ body {
 }
 
 .trix-content blockquote {
-  border-left: 4px solid #e2e8f0;
-  padding-left: 1em;
-  color: #64748b;
+  border-left: 4px solid #059669;
+  background-color: #ecfdf5;
+  padding: 0.75em 1.25em;
+  color: #065f46;
   font-style: italic;
   margin: 0.75em 0;
+  border-radius: 0 0.375em 0.375em 0;
 }
 
 .trix-content pre {
@@ -469,4 +471,32 @@ body {
 
 .prose pre code {
   @apply text-slate-100 bg-transparent border-0 p-0 rounded-none;
+}
+
+/* Quote/info box for published blog posts — overrides Tailwind prose blue defaults */
+.prose blockquote {
+  border-left: 4px solid #059669;
+  background-color: #ecfdf5;
+  padding: 1rem 1.5rem 1rem 3.5rem;
+  color: #065f46;
+  font-style: italic;
+  border-radius: 0 0.5rem 0.5rem 0;
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.prose blockquote::before {
+  content: '\201C';
+  position: absolute;
+  left: 0.75rem;
+  top: 0.5rem;
+  font-size: 2.5rem;
+  line-height: 1;
+  color: #059669;
+  font-style: normal;
+}
+
+/* Trix wraps blockquote text in <p> — strip default prose p margins inside quotes */
+.prose blockquote p {
+  margin: 0;
 }
